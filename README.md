@@ -1,4 +1,4 @@
-# OPEN NETRA DASHBOARD (BACKEND)
+# Open Netra Dashboard (Backend)
 
 Open Netra is a platform ...
 
