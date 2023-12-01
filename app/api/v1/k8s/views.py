@@ -21,7 +21,7 @@ def endpoints(request):
 ###K8S - CREATE POD###
 @login_required(login_url='login')
 def CreatePod(request):
-    if request.method=='POST':
+    if request.method=='GET':
         container_name=request.POST.get('container_name')
         image_name=request.POST.get('image_name')
         pod_name=request.POST.get('pod_name')
@@ -33,4 +33,4 @@ def CreatePod(request):
         pod_metadata = client.V1ObjectMeta(name='my-pod', namespace='default')
         pod_body = client.V1Pod(api_version='v1', kind='Pod', metadata=pod_metadata, spec=pod_spec)    
         v1.create_namespaced_pod(namespace='default', body=pod_body)
-        return HttpResponse('Pod successfully created')
+    return HttpResponse('Pod successfully created')	
