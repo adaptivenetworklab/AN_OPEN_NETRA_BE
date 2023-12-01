@@ -5,6 +5,6 @@ from app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('app.urls')),
-    path('api/v1/token', include('app.api.v1.token.urls')),
-    path('api/v1/k8s', include('app.api.v1.k8s.urls')),
+    path('api/v1/token/', include('app.api.v1.token.urls')),
+    path('api/v1/k8s/', include('app.api.v1.k8s.urls')),
 ]
