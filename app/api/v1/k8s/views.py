@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
@@ -55,7 +56,7 @@ def GetNodes(request):
     if request.method=='GET':
         v1 = client.CoreV1Api()
         list = v1.list_node()
-    return JsonResponse(list)
+    return HttpResponse(list)
 ###k8s - GET DEPLOYMENTS###
 ###k8s - GET SERVICES###
 
