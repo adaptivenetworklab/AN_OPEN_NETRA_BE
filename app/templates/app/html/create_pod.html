@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Netra Dashboard</title>
+</head>
+<body>
+    <form action="" method="post">
+        {% csrf_token %} 
+        <h3>Create Pod Here</h3>
+
+        <label for="container">Container</label>
+        <input type="text" placeholder="Container name" name="container" id="container">
+
+        <label for="image">Image</label>
+        <input type="text" placeholder="Image name" name="image" id="image">
+
+        <label for="pod">Pod</label>
+        <input type="text" placeholder="Pod name" id="pod" name="pod">
+
+        <label for="namespace">Namespace</label>
+        <input type="text" placeholder="Namespace name" id="namespace" name="namespace">
+        <button type="submit">Create</button>
+    </form>
+</body>
+</html>
