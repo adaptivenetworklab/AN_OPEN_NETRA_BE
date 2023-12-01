@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.http import JsonResponse
 from kubernetes import client, config
 from kubernetes.client import configuration
 from pick import pick
@@ -53,8 +54,8 @@ def endpoints(request):
 def GetNodes(request):
     if request.method=='GET':
         v1 = client.CoreV1Api()
-        v1.list_node()
-     
+        list = v1.list_node()
+    return JsonResponse(list)
 ###k8s - GET DEPLOYMENTS###
 ###k8s - GET SERVICES###
 
