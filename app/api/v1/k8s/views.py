@@ -25,34 +25,34 @@ def endpoints(request):
     return Response(routes)
 
 ###k8s - GET PODS###
-# def GetPods(request):
-#     if request.method=='GET':
-#         contexts, active_context = config.list_kube_config_contexts()
-#         if not contexts:
-#             print("Cannot find any context in kube-config file.")
-#             return
-#         contexts = [context['name'] for context in contexts]
-#         active_index = contexts.index(active_context['name'])
-#         option, _ = pick(contexts, title="Pick the context to load",
-#                         default_index=active_index)
-#         # Configs can be set in Configuration class directly or using helper
-#         # utility
-#         config.load_kube_config(context=option)
+def GetPods(request):
+    if request.method=='GET':
+        contexts, active_context = config.list_kube_config_contexts()
+        if not contexts:
+            print("Cannot find any context in kube-config file.")
+            return
+        contexts = [context['name'] for context in contexts]
+        active_index = contexts.index(active_context['name'])
+        option, _ = pick(contexts, title="Pick the context to load",
+                        default_index=active_index)
+        # Configs can be set in Configuration class directly or using helper
+        # utility
+        config.load_kube_config(context=option)
 
-#         print(f"Active host is {configuration.Configuration().host}")
+        print(f"Active host is {configuration.Configuration().host}")
 
-#         v1 = client.CoreV1Api()
-#         print("Listing pods with their IPs:")
-#         ret = v1.list_pod_for_all_namespaces(watch=False)
-#         for item in ret.items:
-#             print(
-#                 "%s\t%s\t%s" %
-#                 (item.status.pod_ip,
-#                 item.metadata.namespace,
-#                 item.metadata.name))
+        v1 = client.CoreV1Api()
+        print("Listing pods with their IPs:")
+        ret = v1.list_pod_for_all_namespaces(watch=False)
+        for item in ret.items:
+            print(
+                "%s\t%s\t%s" %
+                (item.status.pod_ip,
+                item.metadata.namespace,
+                item.metadata.name))
             
-#     if __name__ == '__GetPods__':
-#         GetPods()
+    if __name__ == '__GetPods__':
+        GetPods()
 
 ###k8s - GET NAMESPACES###
 ###k8s - GET NODES###
