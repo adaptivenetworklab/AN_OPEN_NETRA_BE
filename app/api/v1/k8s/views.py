@@ -14,9 +14,13 @@ v1 = client.CoreV1Api()
 @api_view(['GET'])
 def endpoints(request):
     routes = [
-        '/api/v1/k8s/createpod/',
-        '/api/v1/k8s/getpods/',
-        '/api/v1/k8s/getnamespaces/',
+        '/api/v1/k8s/nodes/',
+        '/api/v1/k8s/pods/',
+        '/api/v1/k8s/namespaces/',
+        '/api/v1/k8s/deployments/',
+        '/api/v1/k8s/services/',
+        '/api/v1/k8s/namespaces/namespaces-name/pods',
+
     ]
     return Response(routes)
 
