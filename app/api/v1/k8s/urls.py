@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.endpoints, name='endpoints'),
     path('nodes/', views.GetNodes, name='nodes'),
     path('pods/', views.GetPods, name='pods'),
-    # path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # path('my-api/', MyApiView.as_view(), name='my-api')
+    path('namespaces/', views.GetNamespaces, name='namespaces'),
+    path('deployments/', views.GetDeployments, name='deployments'),
+    path('services/', views.GetServices, name='services'),
 ]

@@ -27,43 +27,41 @@ def endpoints(request):
 ###k8s - GET PODS###
 def GetPods(request):
     if request.method=='GET':
-        contexts, active_context = config.list_kube_config_contexts()
-        if not contexts:
-            print("Cannot find any context in kube-config file.")
-            return
-        contexts = [context['name'] for context in contexts]
-        active_index = contexts.index(active_context['name'])
-        option, _ = pick(contexts, title="Pick the context to load",
-                        default_index=active_index)
-        # Configs can be set in Configuration class directly or using helper
-        # utility
-        config.load_kube_config(context=option)
+        v1 = client.CoreV1Api() 
+        pods_list = v1.list_pod_for_all_namespaces()
+    return HttpResponse(pods_list)
 
-        print(f"Active host is {configuration.Configuration().host}")
-
-        v1 = client.CoreV1Api()
-        print("Listing pods with their IPs:")
-        ret = v1.list_pod_for_all_namespaces(watch=False)
-        for item in ret.items:
-            print(
-                "%s\t%s\t%s" %
-                (item.status.pod_ip,
-                item.metadata.namespace,
-                item.metadata.name))
-            
-    if __name__ == '__GetPods__':
-        GetPods()
 
 ###k8s - GET NAMESPACES###
+def GetNamespaces(request):
+    if request.method=='GET':
+        v1 = client.CoreV1Api()       
+        ns_list = v1.list_namespace()
+    return HttpResponse(ns_list)
+
+
 ###k8s - GET NODES###
 def GetNodes(request):
     if request.method=='GET':
         v1 = client.CoreV1Api()
-        list = v1.list_node()
-    return HttpResponse(list)
-###k8s - GET DEPLOYMENTS###
-###k8s - GET SERVICES###
+        nodes_list = v1.list_node()
+    return HttpResponse(nodes_list)
 
+
+###k8s - GET DEPLOYMENTS###
+def GetDeployments(request):
+    if request.method=='GET':
+        v1 = client.AppsV1Api() 
+        deployments_list: client.V1DeploymentList = v1.list_deployment_for_all_namespaces()
+    return HttpResponse(deployments_list)
+
+
+###k8s - GET SERVICES###
+def GetServices(request):
+    if request.method=='GET':
+        v1 = client.CoreV1Api() 
+        services_list = v1.list_service_for_all_namespaces()
+    return HttpResponse(services_list)
 
 
 ###k8s - CREATE POD###
