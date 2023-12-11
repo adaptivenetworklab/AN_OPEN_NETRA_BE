@@ -1,3 +1,4 @@
+from importlib import metadata
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
@@ -24,26 +25,49 @@ def endpoints(request):
     return Response(routes)
 
 ###k8s - GET PODS###
+# def GetPods(request):
+#     if request.method == 'GET':
+#         v1 = client.CoreV1Api()
+#         pods_list = v1.list_pod_for_all_namespaces()
+
+#         # Convert the pods_list to a dictionary
+#         pods_dict = {}
+#         for pod in pods_list.items:
+#             pods_dict[pod.metadata.name] = {
+#                 'namespace': pod.metadata.namespace,
+#                 'status': pod.status.phase,
+#                 # Add more fields as needed
+#             }
+
+#         # Return JsonResponse with the pods_dict
+#         return JsonResponse(pods_dict)
+
+#     # Handle other HTTP methods if needed
+#     return HttpResponse("Method not allowed", status=405)
 def GetPods(request):
     if request.method == 'GET':
         v1 = client.CoreV1Api()
         pods_list = v1.list_pod_for_all_namespaces()
 
-        # Convert the pods_list to a dictionary
-        pods_dict = {}
+        # Convert the pods_list to a list of dictionaries
+        pods_info = []
         for pod in pods_list.items:
-            pods_dict[pod.metadata.name] = {
+            pod_info = {
+                'name': pod.metadata.name,
+                'ip': pod.status.pod_ip,
+                #'interface': pod.spec.containers[0].interface,  # Adjust based on your container configuration
+                'state': pod.status.phase,
                 'namespace': pod.metadata.namespace,
-                'status': pod.status.phase,
+                'node': pod.spec.node_name,
                 # Add more fields as needed
             }
+            pods_info.append(pod_info)
 
-        # Return JsonResponse with the pods_dict
-        return JsonResponse(pods_dict)
+        # Return JsonResponse with the list of pod information
+        return JsonResponse({'pods': pods_info})
 
     # Handle other HTTP methods if needed
     return HttpResponse("Method not allowed", status=405)
-
 
 ###k8s - GET NAMESPACES###
 def GetNamespaces(request):
@@ -127,3 +151,15 @@ def CreatePod(request):
         return HttpResponse('Pod successfully created')
     return render (request, 'create_pod.html')
     	
+
+###k8s - CREATE NAMESPACE###
+def CreateNamespace(request):
+    if request.method=='POST':
+        v1 = client.CoreV1Api()
+        name=request.POST.get('namespace')
+        namespace_name=client.V1Namespace(metadata=client.V1ObjectMeta(name=name))
+        v1.create_namespace(namespace_name)
+        return HttpResponse('Namespace successfully created')
+    return render (request, 'create_ns.html')
+
+###k8s - CREATE DEPLOYMENTS###
