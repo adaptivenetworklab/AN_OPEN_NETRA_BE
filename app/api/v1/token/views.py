@@ -20,9 +20,9 @@ class MyTokenObtainPairView(TokenObtainPairView):
 @api_view(['GET'])
 def endpoints(request):
     routes = [
-        '/api/v1/tokens/access-token/',
-        '/api/v1/tokens/refresh-token/',
-        '/api/v1/tokens/my-api/'
+        '/api/v1/tokens/access-token',
+        '/api/v1/tokens/refresh-token',
+        '/api/v1/tokens/my-api'
     ]
     return Response(routes)
 

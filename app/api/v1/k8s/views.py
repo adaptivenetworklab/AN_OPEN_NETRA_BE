@@ -8,54 +8,77 @@ from django.http import JsonResponse
 from kubernetes import client, config
 from kubernetes.client import configuration
 from pick import pick
+import json
 
 config.load_kube_config()
 
 @api_view(['GET'])
 def endpoints(request):
     routes = [
-        '/api/v1/k8s/nodes/',
-        '/api/v1/k8s/pods/',
-        '/api/v1/k8s/namespaces/',
-        '/api/v1/k8s/deployments/',
-        '/api/v1/k8s/services/',
-        '/api/v1/k8s/namespaces/namespaces-name/pods',
-
+        '/api/v1/k8s/nodes',
+        '/api/v1/k8s/pods',
+        '/api/v1/k8s/namespaces',
+        '/api/v1/k8s/deployments',
+        '/api/v1/k8s/services',
     ]
     return Response(routes)
 
+###k8s - GET ANNOTATIONS###
+def get_network_status_annotations():
+    # Load your Kubernetes configuration, either in-cluster or from a local Kubeconfig file
+    config.load_kube_config()
+
+    # Initialize the Kubernetes API client
+    v1 = client.CoreV1Api()
+
+    # Create a dictionary to hold pod names and their network status in JSON format
+    pod_network_status = {}
+
+    # List all pods across all namespaces
+    pods = v1.list_pod_for_all_namespaces()
+
+    for pod in pods.items:
+        # Ensure annotations are not None
+        annotations = pod.metadata.annotations or {}
+
+        # Extract the 'k8s.v1.cni.cncf.io/network-status' annotation
+        network_status_str = annotations.get('k8s.v1.cni.cncf.io/network-status')
+
+        if network_status_str:
+            try:
+                # Parse the network status string as JSON
+                network_status_json = json.loads(network_status_str)
+                # Store the parsed JSON against the pod's name
+                pod_network_status[pod.metadata.name] = network_status_json
+            except json.JSONDecodeError:
+                # Handle cases where the annotation is not valid JSON
+                pod_network_status[pod.metadata.name] = "Invalid JSON or not available"
+
+    return pod_network_status
+
 ###k8s - GET PODS###
-# def GetPods(request):
-#     if request.method == 'GET':
-#         v1 = client.CoreV1Api()
-#         pods_list = v1.list_pod_for_all_namespaces()
-
-#         # Convert the pods_list to a dictionary
-#         pods_dict = {}
-#         for pod in pods_list.items:
-#             pods_dict[pod.metadata.name] = {
-#                 'namespace': pod.metadata.namespace,
-#                 'status': pod.status.phase,
-#                 # Add more fields as needed
-#             }
-
-#         # Return JsonResponse with the pods_dict
-#         return JsonResponse(pods_dict)
-
-#     # Handle other HTTP methods if needed
-#     return HttpResponse("Method not allowed", status=405)
 def GetPods(request):
     if request.method == 'GET':
+        config.load_kube_config()
         v1 = client.CoreV1Api()
         pods_list = v1.list_pod_for_all_namespaces()
+
+        # Retrieve all network statuses in advance
+        network_statuses = get_network_status_annotations()
 
         # Convert the pods_list to a list of dictionaries
         pods_info = []
         for pod in pods_list.items:
+            # Ensure annotations are not None
+            annotations = pod.metadata.annotations or {}
+
+            # Retrieve the network status for the current pod
+            network_status_json = network_statuses.get(pod.metadata.name, 'Not available')
+
             pod_info = {
                 'name': pod.metadata.name,
                 'ip': pod.status.pod_ip,
-                #'interface': pod.spec.containers[0].interface,  # Adjust based on your container configuration
+                'network_status': network_status_json,  # Inserting network status in JSON format
                 'state': pod.status.phase,
                 'namespace': pod.metadata.namespace,
                 'node': pod.spec.node_name,
