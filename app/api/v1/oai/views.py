@@ -6,12 +6,25 @@ import yaml
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CU_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-gnb-cu-1')  # Adjust 'subdirectory' as needed
-DU_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-gnb-du-1')  # Adjust 'subdirectory' as needed
-UE_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-nr-ue-1')  # Adjust 'subdirectory' as needed
-CU_VALUES_FILE_PATH = os.path.join(CU_BASE_DIR, 'values.yaml')
-DU_VALUES_FILE_PATH = os.path.join(DU_BASE_DIR, 'values.yaml')
-UE_VALUES_FILE_PATH = os.path.join(UE_BASE_DIR, 'values.yaml')
+CU1_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-gnb-cu-1')  # Adjust 'subdirectory' as needed
+CU2_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-gnb-cu-2')  # Adjust 'subdirectory' as needed
+CU3_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-gnb-cu-3')  # Adjust 'subdirectory' as needed
+DU1_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-gnb-du-1')  # Adjust 'subdirectory' as needed
+DU2_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-gnb-du-2')  # Adjust 'subdirectory' as needed
+DU3_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-gnb-du-3')  # Adjust 'subdirectory' as needed
+UE1_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-nr-ue-1')  # Adjust 'subdirectory' as needed
+UE2_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-nr-ue-2')  # Adjust 'subdirectory' as needed
+UE3_BASE_DIR = os.path.join(BASE_DIR, 'oai/AN-OPEN-NETRA-VNF/oai-nr-ue-3')  # Adjust 'subdirectory' as needed
+CU1_VALUES_FILE_PATH = os.path.join(CU1_BASE_DIR, 'values.yaml')
+CU2_VALUES_FILE_PATH = os.path.join(CU2_BASE_DIR, 'values.yaml')
+CU3_VALUES_FILE_PATH = os.path.join(CU3_BASE_DIR, 'values.yaml')
+DU1_VALUES_FILE_PATH = os.path.join(DU1_BASE_DIR, 'values.yaml')
+DU2_VALUES_FILE_PATH = os.path.join(DU2_BASE_DIR, 'values.yaml')
+DU3_VALUES_FILE_PATH = os.path.join(DU3_BASE_DIR, 'values.yaml')
+UE1_VALUES_FILE_PATH = os.path.join(UE1_BASE_DIR, 'values.yaml')
+UE2_VALUES_FILE_PATH = os.path.join(UE2_BASE_DIR, 'values.yaml')
+UE3_VALUES_FILE_PATH = os.path.join(UE3_BASE_DIR, 'values.yaml')
+
 
 @api_view(['GET'])
 def endpoints(request):
@@ -30,7 +43,7 @@ def CreateCU(request):
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
         # Load the existing YAML file
-        with open(CU_VALUES_FILE_PATH, 'r') as file:
+        with open(CU1_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
 
         # # Update the YAML data
@@ -38,14 +51,14 @@ def CreateCU(request):
         values_data['multus']['f1Interface']['Netmask'] = multus_f1_netmask
         
         # Write the updated data back to the YAML file
-        with open(CU_VALUES_FILE_PATH, 'w') as file:
+        with open(CU1_VALUES_FILE_PATH, 'w') as file:
             yaml.dump(values_data, file)
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
             "helm", "upgrade", "oai-gnb-cu", "--values", "values.yaml",
             ".", "--namespace", "oai"
-        ], cwd=CU_BASE_DIR)
+        ], cwd=CU1_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
 
@@ -59,7 +72,7 @@ def CreateDU(request):
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
         # Load the existing YAML file
-        with open(DU_VALUES_FILE_PATH, 'r') as file:
+        with open(DU1_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
 
         # # Update the YAML data
@@ -67,14 +80,14 @@ def CreateDU(request):
         values_data['multus']['f1Interface']['Netmask'] = multus_f1_netmask
         
         # Write the updated data back to the YAML file
-        with open(DU_VALUES_FILE_PATH, 'w') as file:
+        with open(DU1_VALUES_FILE_PATH, 'w') as file:
             yaml.dump(values_data, file)
         
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "install", "my-release", "./path/to/chart",
-            "-f", "path/to/values.yaml"
-        ], check=True)
+            "helm", "upgrade", "oai-gnb-cu", "--values", "values.yaml",
+            ".", "--namespace", "oai"
+        ], cwd=DU1_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
 
@@ -88,7 +101,7 @@ def CreateUE(request):
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
         # Load the existing YAML file
-        with open(UE_VALUES_FILE_PATH, 'r') as file:
+        with open(UE1_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
 
         # # Update the YAML data
@@ -96,14 +109,14 @@ def CreateUE(request):
         values_data['multus']['f1Interface']['Netmask'] = multus_f1_netmask
         
         # Write the updated data back to the YAML file
-        with open(UE_VALUES_FILE_PATH, 'w') as file:
+        with open(UE1_VALUES_FILE_PATH, 'w') as file:
             yaml.dump(values_data, file)
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "install", "my-release", "./path/to/chart",
-            "-f", "path/to/values.yaml"
-        ], check=True)
+            "helm", "upgrade", "oai-gnb-cu", "--values", "values.yaml",
+            ".", "--namespace", "oai"
+        ], cwd=UE1_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
 
