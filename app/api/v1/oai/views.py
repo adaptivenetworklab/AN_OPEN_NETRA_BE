@@ -54,6 +54,10 @@ def CreateCU(request):
         with open(CU1_VALUES_FILE_PATH, 'w') as file:
             yaml.dump(values_data, file)
 
+        subprocess.run([
+            "kubectl", "delete", "deployments", "oai-gnb-cu", "--namespace", "oai"
+        ])
+
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
             "helm", "upgrade", "oai-gnb-cu", "--values", "values.yaml",
@@ -61,9 +65,9 @@ def CreateCU(request):
         ], cwd=CU1_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
-
     # For GET request, just show the form
     return render(request, 'create_cu.html')
+
 
 def CreateDU(request):
     if request.method == 'POST':
@@ -85,7 +89,7 @@ def CreateDU(request):
         
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "oai-gnb-cu", "--values", "values.yaml",
+            "helm", "upgrade", "oai-gnb-du", "--values", "values.yaml",
             ".", "--namespace", "oai"
         ], cwd=DU1_BASE_DIR)
         
@@ -97,16 +101,16 @@ def CreateDU(request):
 def CreateUE(request):
     if request.method == 'POST':
         # Get the form data
-        multus_f1_int = request.POST.get('multus_f1_int')
-        multus_f1_netmask = request.POST.get('multus_f1_netmask')
+        multus_ip = request.POST.get('multus_ip')
+        multus_netmask = request.POST.get('multus_netmask')
         
         # Load the existing YAML file
         with open(UE1_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
 
         # # Update the YAML data
-        values_data['multus']['f1Interface']['IPadd'] = multus_f1_int
-        values_data['multus']['f1Interface']['Netmask'] = multus_f1_netmask
+        values_data['multus']['ipadd'] = multus_ip
+        values_data['multus']['netmask'] = multus_netmask
         
         # Write the updated data back to the YAML file
         with open(UE1_VALUES_FILE_PATH, 'w') as file:
@@ -114,7 +118,7 @@ def CreateUE(request):
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "oai-gnb-cu", "--values", "values.yaml",
+            "helm", "upgrade", "oai-nr-ue", "--values", "values.yaml",
             ".", "--namespace", "oai"
         ], cwd=UE1_BASE_DIR)
         
