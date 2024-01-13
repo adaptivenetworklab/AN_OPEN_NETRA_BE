@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>Open Netra Dashboard</title>
+</head>
+<body>
+    <div class="w3-container">
+        <div class="w3-bar w3-border w3-light-grey">
+          <div class="w3-bar-item"><a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a></div>
+          <div class="w3-bar-item"><a href="{% url 'upc' %}" class="btn btn-primary">User Plan Config</a></div>
+          <div class="w3-bar-item"><a href="{% url 'rmg' %}" class="btn btn-primary">RAN Metric Graph</a></div>
+          <div class="w3-bar-item"><a href="{% url 'logout' %}" class="btn btn-primary">Logout</a></div>
+        </div>
+      </div>
+      <h2>Config Multi-UE DU</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="multus_f1_int">f1 Interface IPadd:</label><br>
+        <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface"><br>
+
+        <label for="multus_f1_netmask">f1 Interface Netmask:</label><br>
+        <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask"><br>
+        <input type="submit" value="Update Config">
+    </form>
+</body>
+</html>

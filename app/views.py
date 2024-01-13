@@ -14,44 +14,47 @@ from .serializers import UserSerializers
 @login_required(login_url='login')
 @api_view(['GET'])
 def landing(request):
-    if request.user.is_authenticated:
-        return render (request, 'landing.html')
-    else:
-        return redirect('dashboard')
+    # Redirect to the dashboard view
+    return redirect('dashboard')
     
 
 ###MAIN - DASHBOARD###
 @login_required(login_url='login')
 @api_view(['GET'])
 def dashboard(request):
-    return render (request, 'dashboard.html')
+    # Retrieve the username from the session
+    username = request.session.get('username', 'Unknown User')
+    if username == 'admin':
+        return render(request, 'admin_dashboard.html', {'username': username})
+    else:
+        return render(request, 'user_dashboard.html', {'username': username})
 
 
-###MAIN - DEPLOY###
+###MAIN - UAM###
 @login_required(login_url='login')
 @api_view(['GET'])
-def deploy(request):
-    return render (request, 'deploy.html')
+def UserAccountManagement(request):
+    return render (request, 'UAM.html')
 
 
-###MAIN - IMAGES###
+###MAIN - UPC###
 @login_required(login_url='login')
 @api_view(['GET'])
-def images(request):
-    return render (request, 'images.html')
+def UserPlanConfig(request):
+    return render (request, 'UPC.html')
 
 
-###MAIN - SERVICES###
+###MAIN - RMG###
 @login_required(login_url='login')
 @api_view(['GET'])
-def services(request):
-    return render (request, 'services.html')
+def RanMetricGraph(request):
+    return render (request, 'RMG.html')
 
 
 ###AUTH - SIGNUP###
-def SignupPage(request):
+def CreateUser(request):
     if request.method != 'POST':
-        return render (request, 'signup.html')
+        return render (request, 'create_user.html')
     email=request.POST.get('email')
     uname=request.POST.get('username')
     pass1=request.POST.get('password1')
@@ -66,15 +69,20 @@ def SignupPage(request):
 
 ###AUTH - LOGIN###
 def LoginPage(request):
-    if request.method=='POST':
-        username=request.POST.get('username')
-        pass1=request.POST.get('pass')
-        user=authenticate(request, username=username, password=pass1)
-        if user is None:
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        pass1 = request.POST.get('pass')
+        user = authenticate(request, username=username, password=pass1)
+
+        if user is not None:
+            login(request, user)
+            # Store the username in the session
+            request.session['username'] = username
+            return redirect('dashboard')
+        else:
             return HttpResponse('Username or password is incorrect')
-        login(request, user)
-        return redirect('dashboard')
-    return render (request, 'login.html')
+
+    return render(request, 'login.html')
 
 
 ###AUTH - LOGOUT###
