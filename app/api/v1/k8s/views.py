@@ -107,7 +107,6 @@ def GetNamespaces(request):
     # Handle other HTTP methods if needed
     return HttpResponse("Method not allowed", status=405)
 
-
 ###k8s - GET NODES###
 def GetNodes(request):
     if request.method == 'GET':
@@ -122,7 +121,6 @@ def GetNodes(request):
 
     # Handle other HTTP methods if needed
     return HttpResponse("Method not allowed", status=405)
-
 
 ###k8s - GET DEPLOYMENTS###
 def GetDeployments(request):
@@ -139,7 +137,6 @@ def GetDeployments(request):
     # Handle other HTTP methods if needed
     return HttpResponse("Method not allowed", status=405)
 
-
 ###k8s - GET SERVICES###
 def GetServices(request):
     if request.method == 'GET':
@@ -154,7 +151,6 @@ def GetServices(request):
 
     # Handle other HTTP methods if needed
     return HttpResponse("Method not allowed", status=405)
-
 
 ###k8s - CREATE POD###
 def CreatePod(request):
@@ -174,7 +170,6 @@ def CreatePod(request):
         return HttpResponse('Pod successfully created')
     return render (request, 'create_pod.html')
     	
-
 ###k8s - CREATE NAMESPACE###
 def CreateNamespace(request):
     if request.method=='POST':
@@ -185,4 +180,104 @@ def CreateNamespace(request):
         return HttpResponse('Namespace successfully created')
     return render (request, 'create_ns.html')
 
-###k8s - CREATE DEPLOYMENTS###
+
+###RELATED TO 5G COMPONENTS MANAGEMENT FEATURE###
+###SINGLE CU - RESTART###
+def RestartSingleCU(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-cu", "--namespace", "test1"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###SINGLE DU - RESTART###
+def RestartSingleDU(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-du", "--namespace", "test1"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###SINGLE UE - RESTART###
+def RestartSingleUE(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-nr-ue", "--namespace", "test1"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB CU - RESTART###
+def RestartMultignbCU(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-cu", "--namespace", "test2"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB DU1 - RESTART###
+def RestartMultignbDU1(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-du-1", "--namespace", "test2"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB DU2 - RESTART###
+def RestartMultignbDU2(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-du-2", "--namespace", "test2"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB UE - RESTART###
+def RestartMultignbUE(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-nr-ue", "--namespace", "test2"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE CU - RESTART###
+def RestartMultiueCU(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-cu", "--namespace", "test3"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE DU - RESTART###
+def RestartMultiueDU(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-du", "--namespace", "test3"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE UE1 - RESTART###
+def RestartMultiueUE1(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-nr-ue1", "--namespace", "test3"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE UE2 - RESTART###
+def RestartMultiueUE2(request):
+    try:
+        subprocess.run([
+            "kubectl", "rollout", "restart", "deployment", "oai-nr-ue2", "--namespace", "test3"
+        ])
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+

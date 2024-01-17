@@ -510,3 +510,237 @@ def CreateAll5G(request):
     except subprocess.CalledProcessError as e:
         # Handle errors in the subprocesses
         return HttpResponse(f"An error occurred: {e}")
+
+
+###SINGLE CU - START###
+def StartSingleCU(request):
+    try:
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_CU_BASE_DIR)
+        return HttpResponse("CU started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###SINGLE DU - START###
+def StartSingleDU(request):
+    try:
+        subprocess.run([
+            "helm", "install", "gnb-du", "--values", "values-du.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_DU_BASE_DIR)
+        return HttpResponse("DU started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###SINGLE UE - START###
+def StartSingleUE(request):
+    try:
+        subprocess.run([
+            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_UE_BASE_DIR)
+        return HttpResponse("UE started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB CU - START###
+def StartMultignbCU(request):
+    try:
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_CU_BASE_DIR)
+        return HttpResponse("CU started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB DU1 - START###
+def StartMultignbDU1(request):
+    try:
+        subprocess.run([
+            "helm", "install", "gnb-du1", "--values", "values-du.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_DU1_BASE_DIR)
+        return HttpResponse("DU1 started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB DU2 - START###
+def StartMultignbDU2(request):
+    try:
+        subprocess.run([
+            "helm", "install", "gnb-du2", "--values", "values-du.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_DU2_BASE_DIR)
+        return HttpResponse("DU2 started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB UE - START###
+def StartMultignbUE(request):
+    try:
+        subprocess.run([
+            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_UE_BASE_DIR)
+        return HttpResponse("UE started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE CU - START###
+def StartMultiueCU(request):
+    try:
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_CU_BASE_DIR)
+        return HttpResponse("CU started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE DU - START###
+def StartMultiueDU(request):
+    try:
+        subprocess.run([
+            "helm", "install", "gnb-du", "--values", "values-du.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_DU_BASE_DIR)
+        return HttpResponse("DU started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE UE1 - START###
+def StartMultiueUE1(request):
+    try:
+        subprocess.run([
+            "helm", "install", "nr-ue1", "--values", "values-ue.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_UE1_BASE_DIR)
+        return HttpResponse("UE1 started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE UE2 - START###
+def StartMultiueUE2(request):
+    try:
+        subprocess.run([
+            "helm", "install", "nr-ue2", "--values", "values-ue.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_UE2_BASE_DIR)
+        return HttpResponse("UE2 started")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+
+###SINGLE CU - STOP###
+def StopSingleCU(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "gnb-cu", "--namespace", "test1"
+        ], cwd=SINGLE_CU_BASE_DIR)
+        return HttpResponse("CU stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###SINGLE DU - STOP###
+def StopSingleDU(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "gnb-du", "--namespace", "test1"
+        ], cwd=SINGLE_DU_BASE_DIR)
+        return HttpResponse("DU stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###SINGLE UE - STOP###
+def StopSingleUE(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "nr-ue", "--namespace", "test1"
+        ], cwd=SINGLE_UE_BASE_DIR)
+        return HttpResponse("UE stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB CU - STOP###
+def StopMultignbCU(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "gnb-cu", "--namespace", "test2"
+        ], cwd=MULTI_GNB_CU_BASE_DIR)
+        return HttpResponse("CU stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB DU1 - STOP###
+def StopMultignbDU1(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "gnb-du1", "--namespace", "test2"
+        ], cwd=MULTI_GNB_DU1_BASE_DIR)
+        return HttpResponse("DU1 stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB DU2 - STOP###
+def StopMultignbDU2(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "gnb-du2", "--namespace", "test2"
+        ], cwd=MULTI_GNB_DU2_BASE_DIR)
+        return HttpResponse("DU2 stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIGNB UE - STOP###
+def StopMultignbUE(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "nr-ue", "--namespace", "test2"
+        ], cwd=MULTI_GNB_UE_BASE_DIR)
+        return HttpResponse("UE stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE CU - STOP###
+def StopMultiueCU(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "gnb-cu", "--namespace", "test3"
+        ], cwd=MULTI_UE_CU_BASE_DIR)
+        return HttpResponse("CU stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE DU - STOP###
+def StopMultiueDU(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "gnb-du", "--namespace", "test3"
+        ], cwd=MULTI_UE_DU_BASE_DIR)
+        return HttpResponse("DU stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE UE1 - STOP###
+def StopMultiueUE1(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "nr-ue1", "--namespace", "test3"
+        ], cwd=MULTI_UE_UE1_BASE_DIR)
+        return HttpResponse("UE1 stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+
+###MULTIUE UE2 - STOP###
+def StopMultiueUE2(request):
+    try:
+        subprocess.run([
+            "helm", "delete", "nr-ue2", "--namespace", "test3"
+        ], cwd=MULTI_UE_UE2_BASE_DIR)
+        return HttpResponse("UE2 stopped")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"An error occurred: {e}")
+

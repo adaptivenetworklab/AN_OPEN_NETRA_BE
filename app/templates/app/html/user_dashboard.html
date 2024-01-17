@@ -16,7 +16,35 @@
         <div class="w3-bar-item"><a href="{% url 'monitoring' %}" class="btn btn-primary">Monitoring</a></div>
         <div class="w3-bar-item"><a href="{% url 'logout' %}" class="btn btn-primary">Logout</a></div>
       </div>
-      
+      <!-- Component Controls -->
+      <div class="w3-container w3-margin-top">
+        <!-- CU Controls -->
+        <div class="w3-row w3-margin-bottom">
+            <h3>CU Controls</h3>
+            <a href="{% url 'single-cu-start' %}" class="w3-button w3-green">Start CU</a>
+            <a href="{% url 'single-cu-stop' %}" class="w3-button w3-red">Stop CU</a>
+            <a href="{% url 'single-cu-restart' %}" class="w3-button w3-blue">Restart CU</a>
+        </div>
+
+        <!-- DU Controls -->
+        <div class="w3-row w3-margin-bottom">
+            <h3>DU Controls</h3>
+            <a href="{% url 'single-du-start' %}" class="w3-button w3-green">Start DU</a>
+            <a href="{% url 'single-du-stop' %}" class="w3-button w3-red">Stop DU</a>
+            <a href="{% url 'single-du-restart' %}" class="w3-button w3-blue">Restart DU</a>
+        </div>
+
+        <!-- RU Controls -->
+
+
+        <!-- UE Controls -->
+        <div class="w3-row">
+            <h3>UE Controls</h3>
+            <a href="{% url 'single-ue-start' %}" class="w3-button w3-green">Start UE</a>
+            <a href="{% url 'single-ue-stop' %}" class="w3-button w3-red">Stop UE</a>
+            <a href="{% url 'single-ue-restart' %}" class="w3-button w3-blue">Restart UE</a>
+        </div>
+      </div>
     </div>
   </body>
 </html>
