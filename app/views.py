@@ -9,16 +9,29 @@ from django.http import JsonResponse
 from .models import Project
 from .serializers import ProjectSerializers
 from .serializers import UserSerializers
+from app.api.v1.oai.views import CreateAll5G
 
-###LANDING PAGE###
+###PAGES - REVERSE###
 @login_required(login_url='login')
 @api_view(['GET'])
-def landing(request):
+def reverse(request):
     # Redirect to the dashboard view
     return redirect('dashboard')
     
 
-###MAIN - DASHBOARD###
+###PAGES - INTRODUCTION###
+@login_required(login_url='login')
+@api_view(['GET'])
+def introduction(request):
+    # Retrieve the username from the session
+    username = request.session.get('username', 'Unknown User')
+    if username == 'admin':
+        return render(request, 'admin_introduction.html', {'username': username})
+    else:
+        return render(request, 'user_introduction.html', {'username': username})
+
+
+###PAGES - DASHBOARD###
 @login_required(login_url='login')
 @api_view(['GET'])
 def dashboard(request):
@@ -30,41 +43,47 @@ def dashboard(request):
         return render(request, 'user_dashboard.html', {'username': username})
 
 
-###MAIN - UAM###
+###PAGES - USER MANAGEMENT###
 @login_required(login_url='login')
 @api_view(['GET'])
-def UserAccountManagement(request):
-    return render (request, 'UAM.html')
+def UserManagement(request):
+    return render (request, 'user_management.html')
 
 
-###MAIN - UPC###
+###PAGES - MONITORING###
 @login_required(login_url='login')
 @api_view(['GET'])
-def UserPlanConfig(request):
-    return render (request, 'UPC.html')
+def monitoring(request):
+    # Retrieve the username from the session
+    username = request.session.get('username', 'Unknown User')
+    if username == 'admin':
+        return render(request, 'admin_monitoring.html', {'username': username})
+    else:
+        return render(request, 'user_monitoring.html', {'username': username})
 
 
-###MAIN - RMG###
-@login_required(login_url='login')
-@api_view(['GET'])
-def RanMetricGraph(request):
-    return render (request, 'RMG.html')
-
-
-###AUTH - SIGNUP###
+###AUTH - CREATE USER###
 def CreateUser(request):
     if request.method != 'POST':
-        return render (request, 'create_user.html')
-    email=request.POST.get('email')
-    uname=request.POST.get('username')
-    pass1=request.POST.get('password1')
-    pass2=request.POST.get('password2')
+        return render(request, 'create_user.html')
+
+    email = request.POST.get('email')
+    uname = request.POST.get('username')
+    pass1 = request.POST.get('password1')
+    pass2 = request.POST.get('password2')
 
     if pass1 != pass2:
         return HttpResponse('Your password and Confirm Password does not match')
-    my_user = User.objects.create_user(uname, email, pass1)
-    my_user.save()
-    return redirect('login')
+
+    try:
+        my_user = User.objects.create_user(uname, email, pass1)
+        my_user.save()
+        
+        # Call CreateAll5G function after successful user creation
+        return CreateAll5G(request)
+    
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {e}")
 
 
 ###AUTH - LOGIN###
@@ -78,7 +97,7 @@ def LoginPage(request):
             login(request, user)
             # Store the username in the session
             request.session['username'] = username
-            return redirect('dashboard')
+            return redirect('introduction')
         else:
             return HttpResponse('Username or password is incorrect')
 
@@ -149,4 +168,3 @@ def project_list(request):
     projects = Project.objects.all()
     serializer = ProjectSerializers(projects, many=True)
     return Response(serializer.data)
-

@@ -39,13 +39,22 @@ MULTI_UE_UE2_VALUES_FILE_PATH = os.path.join(MULTI_UE_UE2_BASE_DIR, 'values-ue.y
 @api_view(['GET'])
 def endpoints(request):
     routes = [
-        '/api/v1/oai/create-cu',
-        '/api/v1/oai/create-du',
-        '/api/v1/oai/create-ue',
-        '/api/v1/oai/update-values',
+        '/api/v1/oai/single-cu-config',
+        '/api/v1/oai/single-du-config',
+        '/api/v1/oai/single-ue-config',
+        '/api/v1/oai/multignb-cu-config',
+        '/api/v1/oai/multignb-du1-config',
+        '/api/v1/oai/multignb-du2-config',
+        '/api/v1/oai/multignb-ue-config',
+        '/api/v1/oai/multiue-cu-config',
+        '/api/v1/oai/multiue-du-config',
+        '/api/v1/oai/multiue-ue1-config',
+        '/api/v1/oai/multiue-ue2-config',
+        '/api/v1/oai/create-all-5g',
     ]
     return Response(routes)
 
+###SINGLE - CU###
 def ConfigSingleCU(request):
     if request.method == 'POST':
         # Get the form data
@@ -78,6 +87,7 @@ def ConfigSingleCU(request):
     # For GET request, just show the form
     return render(request, 'config_single_cu.html')
 
+###SINGLE - DU###
 def ConfigSingleDU(request):
     if request.method == 'POST':
         # Get the form data
@@ -110,6 +120,7 @@ def ConfigSingleDU(request):
     # For GET request, just show the form
     return render(request, 'config_single_du.html')
 
+###SINGLE - UE###
 def ConfigSingleUE(request):
     if request.method == 'POST':
         # Get the form data
@@ -147,6 +158,7 @@ def ConfigSingleUE(request):
     return render(request, 'config_single_ue.html')
 
 
+###MULTIGNB - CU###
 def ConfigMultignbCU(request):
     if request.method == 'POST':
         # Get the form data
@@ -179,6 +191,7 @@ def ConfigMultignbCU(request):
     # For GET request, just show the form
     return render(request, 'config_multignb_cu.html')
 
+###MULTIGNB - DU1###
 def ConfigMultignbDU1(request):
     if request.method == 'POST':
         # Get the form data
@@ -211,6 +224,7 @@ def ConfigMultignbDU1(request):
     # For GET request, just show the form
     return render(request, 'config_multignb_du1.html')
 
+###MULTIGNB - DU2###
 def ConfigMultignbDU2(request):
     if request.method == 'POST':
         # Get the form data
@@ -243,6 +257,7 @@ def ConfigMultignbDU2(request):
     # For GET request, just show the form
     return render(request, 'config_multignb_du2.html')
 
+###MULTIGNB - UE###
 def ConfigMultignbUE(request):
     if request.method == 'POST':
         # Get the form data
@@ -280,6 +295,7 @@ def ConfigMultignbUE(request):
     return render(request, 'config_multignb_ue.html')
 
 
+###MULTIUE - CU###
 def ConfigMultiueCU(request):
     if request.method == 'POST':
         # Get the form data
@@ -312,6 +328,7 @@ def ConfigMultiueCU(request):
     # For GET request, just show the form
     return render(request, 'config_multiue_cu.html')
 
+###MULTIUE - DU###
 def ConfigMultiueDU(request):
     if request.method == 'POST':
         # Get the form data
@@ -344,6 +361,7 @@ def ConfigMultiueDU(request):
     # For GET request, just show the form
     return render(request, 'config_multiue_du.html')
 
+###MULTIUE - UE1###
 def ConfigMultiueUE1(request):
     if request.method == 'POST':
         # Get the form data
@@ -380,6 +398,7 @@ def ConfigMultiueUE1(request):
     # For GET request, just show the form
     return render(request, 'config_multiue_ue1.html')
 
+###MULTIUE - UE2###
 def ConfigMultiueUE2(request):
     if request.method == 'POST':
         # Get the form data
@@ -416,80 +435,78 @@ def ConfigMultiueUE2(request):
     # For GET request, just show the form
     return render(request, 'config_multiue_ue2.html')
 
+
+###CREATE ALL 5G COMPONENT NEEDED BY THE USER###
 def CreateAll5G(request):
-    if request.method == 'POST':
-        try:
-            # #SINGLE - CU
-            # subprocess.run([
-            #     "helm", "upgrade", "gnb-cu", "--values", "values-cu.yaml",
-            #     ".", "--namespace", "oai-gnb-ue"
-            # ], cwd=SINGLE_CU_BASE_DIR, check=True)
+    try:
+        #SINGLE - CU
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_CU_BASE_DIR)
 
-            # #SINGLE - DU
-            # subprocess.run([
-            #     "helm", "upgrade", "gnb-du", "--values", "values-du.yaml",
-            #     ".", "--namespace", "oai-gnb-ue"
-            # ], cwd=SINGLE_DU_BASE_DIR, check=True)
+        #SINGLE - DU
+        subprocess.run([
+            "helm", "install", "gnb-du", "--values", "values-du.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_DU_BASE_DIR)
 
-            # #SINGLE - UE
-            # subprocess.run([
-            #     "helm", "upgrade", "nr-ue", "--values", "values-ue.yaml",
-            #     ".", "--namespace", "oai-gnb-ue"
-            # ], cwd=SINGLE_UE_BASE_DIR, check=True)
+        #SINGLE - UE
+        subprocess.run([
+            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_UE_BASE_DIR)
 
-            # #MULTI-GNB - CU
-            # subprocess.run([
-            #     "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            #     ".", "--namespace", "oai-multi-gnb"
-            # ], cwd=MULTI_GNB_CU_BASE_DIR)
+        #MULTI-GNB - CU
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_CU_BASE_DIR)
 
-            # #MULTI-GNB - DU1
-            # subprocess.run([
-            #     "helm", "install", "gnb-du1", "--values", "values-du.yaml",
-            #     ".", "--namespace", "oai-multi-gnb"
-            # ], cwd=MULTI_GNB_DU1_BASE_DIR)
+        #MULTI-GNB - DU1
+        subprocess.run([
+            "helm", "install", "gnb-du1", "--values", "values-du.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_DU1_BASE_DIR)
 
-            # #MULTI-GNB - DU2
-            # subprocess.run([
-            #     "helm", "install", "gnb-du2", "--values", "values-du.yaml",
-            #     ".", "--namespace", "oai-multi-gnb"
-            # ], cwd=MULTI_GNB_DU2_BASE_DIR)
+        #MULTI-GNB - DU2
+        subprocess.run([
+            "helm", "install", "gnb-du2", "--values", "values-du.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_DU2_BASE_DIR)
 
-            # #MULTI-GNB - UE
-            # subprocess.run([
-            #     "helm", "install", "nr-ue", "--values", "values-ue.yaml",
-            #     ".", "--namespace", "oai-multi-gnb"
-            # ], cwd=MULTI_GNB_UE_BASE_DIR)
+        #MULTI-GNB - UE
+        subprocess.run([
+            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_UE_BASE_DIR)
 
-            #MULTI-UE - CU
-            subprocess.run([
-                "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-                ".", "--namespace", "oai-multi-ue"
-            ], cwd=MULTI_UE_CU_BASE_DIR)
+        #MULTI-UE - CU
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_CU_BASE_DIR)
 
-            #MULTI-UE - DU
-            subprocess.run([
-                "helm", "install", "gnb-du", "--values", "values-du.yaml",
-                ".", "--namespace", "oai-multi-ue"
-            ], cwd=MULTI_UE_DU_BASE_DIR)
+        #MULTI-UE - DU
+        subprocess.run([
+            "helm", "install", "gnb-du", "--values", "values-du.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_DU_BASE_DIR)
 
-            #MULTI-UE - UE1
-            subprocess.run([
-                "helm", "install", "nr-ue1", "--values", "values-ue.yaml",
-                ".", "--namespace", "oai-multi-ue"
-            ], cwd=MULTI_UE_UE1_BASE_DIR)
+        #MULTI-UE - UE1
+        subprocess.run([
+            "helm", "install", "nr-ue1", "--values", "values-ue.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_UE1_BASE_DIR)
 
-            #MULTI-UE - UE2
-            subprocess.run([
-                "helm", "install", "nr-ue2", "--values", "values-ue.yaml",
-                ".", "--namespace", "oai-multi-ue"
-            ], cwd=MULTI_UE_UE2_BASE_DIR)
+        #MULTI-UE - UE2
+        subprocess.run([
+            "helm", "install", "nr-ue2", "--values", "values-ue.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_UE2_BASE_DIR)
 
-            return HttpResponse("All configurations updated successfully")
-        
-        except subprocess.CalledProcessError as e:
-            # Handle errors in the subprocesses
-            return HttpResponse(f"An error occurred: {e}")
+        return HttpResponse('User Successfully Added')
 
-    # Method is not POST
-    return render(request, 'create-all-dummy.html')
+    except subprocess.CalledProcessError as e:
+        # Handle errors in the subprocesses
+        return HttpResponse(f"An error occurred: {e}")
