@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Open Netra Dashboard</title>
+</head>
+<body>
+    <h1>Update Credentials</h1>
+    <form method="post" action="{% url 'update-user' user.id %}">
+        {% csrf_token %}
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}">
+        </div>
+        <div>
+            <label for="password">New Password:</label>
+            <input type="password" id="password" name="password">
+        </div>
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

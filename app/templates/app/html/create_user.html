@@ -4,27 +4,11 @@
     <title>Open Netra Dashboard</title>
 </head>
 <body>
-    <div class="background">
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-    <form action="" method="post">
-        {% csrf_token %} 
-        <h3>Create New User</h3>
-
-        <label for="email">Email</label>
-        <input type="email" placeholder="Email or Phone" name="email" id="email">
-
-        <label for="username">Username</label>
-        <input type="text" placeholder="Username" name="username" id="username">
-
-        <label for="password1">Password</label>
-        <input type="password" placeholder="Password" id="password1" name="password1">
-
-
-        <label for="password2">Confrom Password</label>
-        <input type="password" placeholder="Confrom Password" id="password2" name="password2">
-        
+    <h1>Create Users</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="user_count">Number of Users to Create:</label>
+        <input type="number" id="user_count" name="user_count" min="1" required>
         <button type="submit">Create</button>
     </form>
 </body>

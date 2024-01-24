@@ -18,6 +18,29 @@
         <div class="w3-bar-item"><a href="{% url 'logout' %}" class="btn btn-primary">Logout</a></div>
       </div>
     </div>
-    <a href="{% url 'create-user' %}" class="btn btn-primary">Create User</a>
+    <h1>User List</h1>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Level</th>
+            <th>Completion</th>
+            <th>Actions</th>
+            <!-- Add more columns as needed -->
+        </tr>
+        {% for entry in user_data %}
+        <tr>
+            <td>{{ entry.user.username }}</td>
+            <td>{{ entry.level }}</td>
+            <td>Sekian Persen</td>
+            <td>
+                <a href="{% url 'update-user' entry.user.id %}" class="btn btn-primary">Edit</a>
+                <a href="{% url 'delete-user' entry.user.id %}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <br>
+    <a href="{% url 'create-user' %}" class="btn btn-primary">Create New User</a>
   </body>
 </html>

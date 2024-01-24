@@ -3,7 +3,9 @@ from . import views
 
 urlpatterns = [
     path('', views.reverse, name='reverse'),
-    path('user-account-management/create-user', views.CreateUser, name='create-user'),
+    path('user-management/create-user', views.CreateUser, name='create-user'),
+    path('user-management/update-user/<int:user_id>', views.UpdateUser, name='update-user'),
+    path('user-management/delete-user/<int:user_id>', views.DeleteUser, name='delete-user'),
     path('auth/login', views.LoginPage, name='login'),
     path('auth/logout', views.LogoutPage, name='logout'),
     path('dashboard', views.dashboard, name='dashboard'),

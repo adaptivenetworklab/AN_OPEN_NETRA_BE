@@ -1,15 +1,14 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse
-from .models import Project
-from .serializers import ProjectSerializers
-from .serializers import UserSerializers
-from app.api.v1.oai.views import CreateAll5G
+from app.api.v1.oai.views import CreateAll5G, DeleteAll5G
+from .models import UserProfile 
+import re
 
 ###PAGES - REVERSE###
 @login_required(login_url='login')
@@ -33,7 +32,6 @@ def introduction(request):
 
 ###PAGES - DASHBOARD###
 @login_required(login_url='login')
-@api_view(['GET'])
 def dashboard(request):
     # Retrieve the username from the session
     username = request.session.get('username', 'Unknown User')
@@ -43,16 +41,23 @@ def dashboard(request):
         return render(request, 'user_dashboard.html', {'username': username})
 
 
-###PAGES - USER MANAGEMENT###
+###PAGES - USER MANAGEMENT & LIST USER###
 @login_required(login_url='login')
-@api_view(['GET'])
 def UserManagement(request):
-    return render (request, 'user_management.html')
+    user_data = []
+
+    for user in User.objects.filter(is_superuser=False):
+        profile, created = UserProfile.objects.get_or_create(user=user)
+        user_data.append({
+            'user': user,
+            'level': profile.level
+        })
+
+    return render(request, 'user_management.html', {'user_data': user_data})
 
 
 ###PAGES - MONITORING###
 @login_required(login_url='login')
-@api_view(['GET'])
 def monitoring(request):
     # Retrieve the username from the session
     username = request.session.get('username', 'Unknown User')
@@ -62,28 +67,66 @@ def monitoring(request):
         return render(request, 'user_monitoring.html', {'username': username})
 
 
-###AUTH - CREATE USER###
+###USER - CREATE A NEW USER###
+@login_required(login_url='login')
 def CreateUser(request):
-    if request.method != 'POST':
+    if request.method == 'POST':
+        try:
+            user_count = int(request.POST.get('user_count', 1))
+            user_count = max(user_count, 1)  # Ensure at least one user is created
+
+            highest_number = 0
+
+            # Find the highest existing username number
+            for user in User.objects.filter(username__startswith='user'):
+                match = re.match(r'user(\d+)', user.username)
+                if match:
+                    number = int(match.group(1))
+                    highest_number = max(highest_number, number)
+
+            # Start creating users from the next available number
+            for i in range(highest_number + 1, highest_number + user_count + 1):
+                username = f'user{i}'
+                password = f'user{i}'
+                if not User.objects.filter(username=username).exists():
+                    new_user = User.objects.create_user(username=username, password=password)
+                    UserProfile.objects.create(user=new_user, level=1)
+                    return CreateAll5G(request)
+
+            return HttpResponse(f"{user_count} users created successfully")
+        except Exception as e:
+            return HttpResponse(f"An error occurred: {e}")
+    else:
         return render(request, 'create_user.html')
 
-    email = request.POST.get('email')
-    uname = request.POST.get('username')
-    pass1 = request.POST.get('password1')
-    pass2 = request.POST.get('password2')
 
-    if pass1 != pass2:
-        return HttpResponse('Your password and Confirm Password does not match')
+###USER - UPDATE USER###
+@login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)  # Ensure only superusers can update users
+def UpdateUser(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
 
-    try:
-        my_user = User.objects.create_user(uname, email, pass1)
-        my_user.save()
-        
-        # Call CreateAll5G function after successful user creation
-        return CreateAll5G(request)
-    
-    except Exception as e:
-        return HttpResponse(f"An error occurred: {e}")
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST.get('password')
+
+        user.username = username
+        if password:
+            user.set_password(password)
+        user.save()
+
+        return redirect('user-management')  # Redirect to user management page
+
+    return render(request, 'update_user.html', {'user': user})
+
+
+###USER - DELETE USER###
+@login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
+def DeleteUser(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    user.delete()
+    return DeleteAll5G(request)
 
 
 ###AUTH - LOGIN###
@@ -109,62 +152,3 @@ def LogoutPage(request):
     logout(request)
     return redirect('login')
 
-
-###ADMIN - USER LIST###
-@api_view(['GET', 'POST'])
-def user_list(request):
-    #Handles GET Request
-    if request.method == 'GET':
-        #/users/?query=username.value
-        query = request.GET.get('query')
-
-        if query is None:
-            query = ''
-
-        users = User.objects.filter(username__icontains=query)
-        serializer = UserSerializers(users, many=True)
-        return Response(serializer.data)
-
-    if request.method == 'POST':
-        user = User.objects.create(
-            username = request.data['username'],
-            password = request.data['password']
-        )
-        serializer = UserSerializers(user, many=False)
-        return Response(serializer.data)
-
-
-###ADMIN - USER DETAIL###
-class UserDetail(APIView):
-
-    def get_object(self, username):
-        try:
-            return User.objects.get(username=username)
-        except User.DoesNotExist as e:
-            raise JsonResponse('Users does not exist') from e
-
-    def get(self, request, username):
-        users = self.get_object(username)
-        serializer = UserSerializers(users, many=False)
-        return Response(serializer.data)
-    
-    def put(self, request, username):
-        users = self.get_object(username)
-        users.username = request.data['username']
-        users.password = request.data['password']
-        users.save()
-        serializer = UserSerializers(users, many=False)
-        return Response(serializer.data)
-    
-    def delete(self, request, username):
-        users = self.get_object(username)
-        users.delete()
-        return Response('user successfully deleted')
-
-    
-###ADMIN - PROJECT LIST###    
-@api_view(['GET'])
-def project_list(request):
-    projects = Project.objects.all()
-    serializer = ProjectSerializers(projects, many=True)
-    return Response(serializer.data)

@@ -54,6 +54,148 @@ def endpoints(request):
     ]
     return Response(routes)
 
+
+###CREATE ALL 5G COMPONENT NEEDED BY THE USER###
+def CreateAll5G(request):
+    try:
+        #SINGLE - CU
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_CU_BASE_DIR)
+
+        #SINGLE - DU
+        subprocess.run([
+            "helm", "install", "gnb-du", "--values", "values-du.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_DU_BASE_DIR)
+
+        #SINGLE - UE
+        subprocess.run([
+            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", "test1"
+        ], cwd=SINGLE_UE_BASE_DIR)
+
+        #MULTI-GNB - CU
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_CU_BASE_DIR)
+
+        #MULTI-GNB - DU1
+        subprocess.run([
+            "helm", "install", "gnb-du1", "--values", "values-du.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_DU1_BASE_DIR)
+
+        #MULTI-GNB - DU2
+        subprocess.run([
+            "helm", "install", "gnb-du2", "--values", "values-du.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_DU2_BASE_DIR)
+
+        #MULTI-GNB - UE
+        subprocess.run([
+            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", "test2"
+        ], cwd=MULTI_GNB_UE_BASE_DIR)
+
+        #MULTI-UE - CU
+        subprocess.run([
+            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_CU_BASE_DIR)
+
+        #MULTI-UE - DU
+        subprocess.run([
+            "helm", "install", "gnb-du", "--values", "values-du.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_DU_BASE_DIR)
+
+        #MULTI-UE - UE1
+        subprocess.run([
+            "helm", "install", "nr-ue1", "--values", "values-ue.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_UE1_BASE_DIR)
+
+        #MULTI-UE - UE2
+        subprocess.run([
+            "helm", "install", "nr-ue2", "--values", "values-ue.yaml",
+            ".", "--namespace", "test3"
+        ], cwd=MULTI_UE_UE2_BASE_DIR)
+
+        return HttpResponse('User Successfully Created')
+
+    except subprocess.CalledProcessError as e:
+        # Handle errors in the subprocesses
+        return HttpResponse(f"An error occurred: {e}")
+
+
+###DELETE ALL 5G COMPONENT ALONGSIDE USER ACCOUNT DELETION###
+def DeleteAll5G(request):
+    try:
+        #SINGLE - CU
+        subprocess.run([
+            "helm", "delete", "gnb-cu", "--namespace", "test1"
+        ])
+
+        #SINGLE - DU
+        subprocess.run([
+            "helm", "delete", "gnb-du", "--namespace", "test1"
+        ])
+
+        #SINGLE - UE
+        subprocess.run([
+            "helm", "delete", "nr-ue", "--namespace", "test1"
+        ])
+
+        #MULTI-GNB - CU
+        subprocess.run([
+            "helm", "delete", "gnb-cu", "--namespace", "test2"
+        ])
+
+        #MULTI-GNB - DU1
+        subprocess.run([
+            "helm", "delete", "gnb-du1", "--namespace", "test2"
+        ])
+
+        #MULTI-GNB - DU2
+        subprocess.run([
+            "helm", "delete", "gnb-du2", "--namespace", "test2"
+        ])
+
+        #MULTI-GNB - UE
+        subprocess.run([
+            "helm", "delete", "nr-ue", "--namespace", "test2"
+        ])
+
+        #MULTI-UE - CU
+        subprocess.run([
+            "helm", "delete", "gnb-cu", "--namespace", "test3"
+        ])
+
+        #MULTI-UE - DU
+        subprocess.run([
+            "helm", "delete", "gnb-du", "--namespace", "test3"
+        ])
+
+        #MULTI-UE - UE1
+        subprocess.run([
+            "helm", "delete", "nr-ue1", "--namespace", "test3"
+        ])
+
+        #MULTI-UE - UE2
+        subprocess.run([
+            "helm", "delete", "nr-ue2", "--namespace", "test3"
+        ])
+
+        return HttpResponse('User Successfully Deleted')
+
+    except subprocess.CalledProcessError as e:
+        # Handle errors in the subprocesses
+        return HttpResponse(f"An error occurred: {e}")
+
+
 ###SINGLE - CU###
 def ConfigSingleCU(request):
     if request.method == 'POST':
@@ -436,82 +578,6 @@ def ConfigMultiueUE2(request):
     return render(request, 'config_multiue_ue2.html')
 
 
-###CREATE ALL 5G COMPONENT NEEDED BY THE USER###
-def CreateAll5G(request):
-    try:
-        #SINGLE - CU
-        subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test1"
-        ], cwd=SINGLE_CU_BASE_DIR)
-
-        #SINGLE - DU
-        subprocess.run([
-            "helm", "install", "gnb-du", "--values", "values-du.yaml",
-            ".", "--namespace", "test1"
-        ], cwd=SINGLE_DU_BASE_DIR)
-
-        #SINGLE - UE
-        subprocess.run([
-            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
-            ".", "--namespace", "test1"
-        ], cwd=SINGLE_UE_BASE_DIR)
-
-        #MULTI-GNB - CU
-        subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test2"
-        ], cwd=MULTI_GNB_CU_BASE_DIR)
-
-        #MULTI-GNB - DU1
-        subprocess.run([
-            "helm", "install", "gnb-du1", "--values", "values-du.yaml",
-            ".", "--namespace", "test2"
-        ], cwd=MULTI_GNB_DU1_BASE_DIR)
-
-        #MULTI-GNB - DU2
-        subprocess.run([
-            "helm", "install", "gnb-du2", "--values", "values-du.yaml",
-            ".", "--namespace", "test2"
-        ], cwd=MULTI_GNB_DU2_BASE_DIR)
-
-        #MULTI-GNB - UE
-        subprocess.run([
-            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
-            ".", "--namespace", "test2"
-        ], cwd=MULTI_GNB_UE_BASE_DIR)
-
-        #MULTI-UE - CU
-        subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test3"
-        ], cwd=MULTI_UE_CU_BASE_DIR)
-
-        #MULTI-UE - DU
-        subprocess.run([
-            "helm", "install", "gnb-du", "--values", "values-du.yaml",
-            ".", "--namespace", "test3"
-        ], cwd=MULTI_UE_DU_BASE_DIR)
-
-        #MULTI-UE - UE1
-        subprocess.run([
-            "helm", "install", "nr-ue1", "--values", "values-ue.yaml",
-            ".", "--namespace", "test3"
-        ], cwd=MULTI_UE_UE1_BASE_DIR)
-
-        #MULTI-UE - UE2
-        subprocess.run([
-            "helm", "install", "nr-ue2", "--values", "values-ue.yaml",
-            ".", "--namespace", "test3"
-        ], cwd=MULTI_UE_UE2_BASE_DIR)
-
-        return HttpResponse('User Successfully Added')
-
-    except subprocess.CalledProcessError as e:
-        # Handle errors in the subprocesses
-        return HttpResponse(f"An error occurred: {e}")
-
-
 ###SINGLE CU - START###
 def StartSingleCU(request):
     try:
@@ -639,7 +705,7 @@ def StopSingleCU(request):
     try:
         subprocess.run([
             "helm", "delete", "gnb-cu", "--namespace", "test1"
-        ], cwd=SINGLE_CU_BASE_DIR)
+        ])
         return HttpResponse("CU stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -649,7 +715,7 @@ def StopSingleDU(request):
     try:
         subprocess.run([
             "helm", "delete", "gnb-du", "--namespace", "test1"
-        ], cwd=SINGLE_DU_BASE_DIR)
+        ])
         return HttpResponse("DU stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -659,7 +725,7 @@ def StopSingleUE(request):
     try:
         subprocess.run([
             "helm", "delete", "nr-ue", "--namespace", "test1"
-        ], cwd=SINGLE_UE_BASE_DIR)
+        ])
         return HttpResponse("UE stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -669,7 +735,7 @@ def StopMultignbCU(request):
     try:
         subprocess.run([
             "helm", "delete", "gnb-cu", "--namespace", "test2"
-        ], cwd=MULTI_GNB_CU_BASE_DIR)
+        ])
         return HttpResponse("CU stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -679,7 +745,7 @@ def StopMultignbDU1(request):
     try:
         subprocess.run([
             "helm", "delete", "gnb-du1", "--namespace", "test2"
-        ], cwd=MULTI_GNB_DU1_BASE_DIR)
+        ])
         return HttpResponse("DU1 stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -689,7 +755,7 @@ def StopMultignbDU2(request):
     try:
         subprocess.run([
             "helm", "delete", "gnb-du2", "--namespace", "test2"
-        ], cwd=MULTI_GNB_DU2_BASE_DIR)
+        ])
         return HttpResponse("DU2 stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -699,7 +765,7 @@ def StopMultignbUE(request):
     try:
         subprocess.run([
             "helm", "delete", "nr-ue", "--namespace", "test2"
-        ], cwd=MULTI_GNB_UE_BASE_DIR)
+        ])
         return HttpResponse("UE stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -709,7 +775,7 @@ def StopMultiueCU(request):
     try:
         subprocess.run([
             "helm", "delete", "gnb-cu", "--namespace", "test3"
-        ], cwd=MULTI_UE_CU_BASE_DIR)
+        ])
         return HttpResponse("CU stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -719,7 +785,7 @@ def StopMultiueDU(request):
     try:
         subprocess.run([
             "helm", "delete", "gnb-du", "--namespace", "test3"
-        ], cwd=MULTI_UE_DU_BASE_DIR)
+        ])
         return HttpResponse("DU stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -729,7 +795,7 @@ def StopMultiueUE1(request):
     try:
         subprocess.run([
             "helm", "delete", "nr-ue1", "--namespace", "test3"
-        ], cwd=MULTI_UE_UE1_BASE_DIR)
+        ])
         return HttpResponse("UE1 stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -739,7 +805,7 @@ def StopMultiueUE2(request):
     try:
         subprocess.run([
             "helm", "delete", "nr-ue2", "--namespace", "test3"
-        ], cwd=MULTI_UE_UE2_BASE_DIR)
+        ])
         return HttpResponse("UE2 stopped")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
