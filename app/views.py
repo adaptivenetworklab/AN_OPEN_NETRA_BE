@@ -9,6 +9,10 @@ from django.http import JsonResponse
 from app.api.v1.oai.views import CreateAll5G, DeleteAll5G
 from .models import UserProfile 
 import re
+from .k8s_templates import get_role_yaml, get_role_binding_yaml
+import subprocess
+from app.api.v1.k8s.views import GetPods
+from .utils import check_helm_deployment_exists
 
 ###PAGES - REVERSE###
 @login_required(login_url='login')
@@ -33,12 +37,49 @@ def introduction(request):
 ###PAGES - DASHBOARD###
 @login_required(login_url='login')
 def dashboard(request):
-    # Retrieve the username from the session
+    user_profile = UserProfile.objects.get(user=request.user)
     username = request.session.get('username', 'Unknown User')
+
     if username == 'admin':
-        return render(request, 'admin_dashboard.html', {'username': username})
+        return render(request, 'admin_dashboard.html')
     else:
-        return render(request, 'user_dashboard.html', {'username': username})
+        namespace = f"{username}-namespace" 
+        single_cu_exists = check_helm_deployment_exists("single-cu", namespace)
+        single_du_exists = check_helm_deployment_exists("single-du", namespace)
+        single_ru_exists = check_helm_deployment_exists("single-du", namespace)
+        single_ue_exists = check_helm_deployment_exists("single-ue", namespace)
+        multignb_cu_exists = check_helm_deployment_exists("multignb-cu", namespace)
+        multignb_du1_exists = check_helm_deployment_exists("multignb-du1", namespace)
+        multignb_du2_exists = check_helm_deployment_exists("multignb-du2", namespace)
+        multignb_ru1_exists = check_helm_deployment_exists("multignb-du1", namespace)
+        multignb_ru2_exists = check_helm_deployment_exists("multignb-du2", namespace)
+        multignb_ue_exists = check_helm_deployment_exists("multignb-ue", namespace)
+        multiue_cu_exists = check_helm_deployment_exists("multiue-cu", namespace)
+        multiue_du_exists = check_helm_deployment_exists("multiue-du", namespace)
+        multiue_ru_exists = check_helm_deployment_exists("multiue-du", namespace)
+        multiue_ue1_exists = check_helm_deployment_exists("multiue-ue1", namespace)
+        multiue_ue2_exists = check_helm_deployment_exists("multiue-ue2", namespace)
+
+
+        context = {
+            'user_level': user_profile.level,
+            'single_cu_exists': single_cu_exists,
+            'single_du_exists': single_du_exists,
+            'single_ru_exists': single_ru_exists,
+            'single_ue_exists': single_ue_exists,
+            'multignb_cu_exists': multignb_cu_exists,
+            'multignb_du1_exists': multignb_du1_exists,
+            'multignb_du2_exists': multignb_du2_exists,
+            'multignb_ru1_exists': multignb_ru1_exists,
+            'multignb_ru2_exists': multignb_ru2_exists,
+            'multignb_ue_exists': multignb_ue_exists,
+            'multiue_cu_exists': multiue_cu_exists,
+            'multiue_du_exists': multiue_du_exists,
+            'multiue_ru_exists': multiue_ru_exists,
+            'multiue_ue1_exists': multiue_ue1_exists,
+            'multiue_ue2_exists': multiue_ue2_exists
+        }
+        return render(request, 'user_dashboard.html', context)
 
 
 ###PAGES - USER MANAGEMENT & LIST USER###
@@ -76,6 +117,7 @@ def CreateUser(request):
             user_count = max(user_count, 1)  # Ensure at least one user is created
 
             highest_number = 0
+            created_users = 0  # To count successfully created users
 
             # Find the highest existing username number
             for user in User.objects.filter(username__startswith='user'):
@@ -88,16 +130,38 @@ def CreateUser(request):
             for i in range(highest_number + 1, highest_number + user_count + 1):
                 username = f'user{i}'
                 password = f'user{i}'
+                namespace = f'user{i}-namespace'
+                role_name = f'user{i}-role'
+                role_binding_name = f'user{i}-rolebinding'
+
                 if not User.objects.filter(username=username).exists():
                     new_user = User.objects.create_user(username=username, password=password)
                     UserProfile.objects.create(user=new_user, level=1)
-                    return CreateAll5G(request)
+                    
+                    # Create the user's namespace
+                    subprocess.run(["kubectl", "create", "namespace", namespace])
 
-            return HttpResponse(f"{user_count} users created successfully")
+                    # Generate the role and role binding YAML
+                    role_yaml = get_role_yaml(namespace, role_name)
+                    role_binding_yaml = get_role_binding_yaml(namespace, role_binding_name, username, role_name)
+
+                    # Apply the role and role binding
+                    subprocess.run(["kubectl", "apply", "-f", "-"], input=role_yaml.encode('utf-8'))
+                    subprocess.run(["kubectl", "apply", "-f", "-"], input=role_binding_yaml.encode('utf-8'))
+
+                    # Call CreateAll5G with the specific namespace
+                    create_5g_result = CreateAll5G(request, namespace)
+                    if create_5g_result != "Success":
+                        return HttpResponse(create_5g_result)
+
+                    created_users += 1
+
+            return HttpResponse(f"{created_users} users created successfully")
         except Exception as e:
             return HttpResponse(f"An error occurred: {e}")
     else:
         return render(request, 'create_user.html')
+
 
 
 ###USER - UPDATE USER###
@@ -125,9 +189,17 @@ def UpdateUser(request, user_id):
 @user_passes_test(lambda u: u.is_superuser)
 def DeleteUser(request, user_id):
     user = get_object_or_404(User, pk=user_id)
-    user.delete()
-    return DeleteAll5G(request)
+    namespace = f"{user.username}-namespace"  # Derive namespace from username
 
+    # Delete user's Kubernetes resources first
+    response = DeleteAll5G(request, namespace)
+
+    # If Kubernetes resources deleted successfully, delete the User object
+    if response.status_code == 200:
+        user.delete()
+        return HttpResponse('User and associated resources successfully deleted')
+    else:
+        return response
 
 ###AUTH - LOGIN###
 def LoginPage(request):

@@ -16,6 +16,7 @@ oauthlib==3.2.2
 packaging==23.2
 pick==2.2.0
 pipreqs==0.4.13
+psycopg
 pyasn1==0.5.1
 pyasn1-modules==0.3.0
 pydantic==2.5.3

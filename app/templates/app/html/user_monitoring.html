@@ -4,19 +4,40 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    
-    <title>Open Netra Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <title>OpenNetra - Monitoring</title>
+    <style>
+      body {
+          font-family: 'Poppins', sans-serif;
+          background-color: #f4f4f4;
+          color: #333;
+          margin: 0;
+          padding: 0;
+      }
+      .navbar {
+          background-color: #5D3B8C; /* Dark Purple */
+          color: white;
+          padding: 10px 0;
+          text-align: center;
+      }
+      .navbar a {
+          color: white;
+          padding: 10px 20px;
+          text-decoration: none;
+          transition: background-color 0.3s, color 0.3s;
+      }
+      .navbar a:hover {
+          background-color: #E75480; /* Pink */
+          color: white;
+      }
+    </style>
   </head>
   <body>
-    <div class="w3-container">
-      <div class="w3-bar w3-border w3-light-grey">
-        <div class="w3-bar-item"><a href="{% url 'introduction' %}" class="btn btn-primary">Introduction</a></div>
-        <div class="w3-bar-item"><a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a></div>
-        <div class="w3-bar-item"><a href="{% url 'monitoring' %}" class="btn btn-primary">Monitoring</a></div>
-        <div class="w3-bar-item"><a href="{% url 'logout' %}" class="btn btn-primary">Logout</a></div>
-      </div>
-      
+    <div class="navbar">
+      <a href="{% url 'introduction' %}">Introduction</a>
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <a href="{% url 'monitoring' %}">Monitoring</a>
+      <a href="{% url 'logout' %}">Sign Out</a>
     </div>
   </body>
 </html>

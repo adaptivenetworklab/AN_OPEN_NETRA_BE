@@ -102,6 +102,7 @@ MIDDLEWARE = [
     #///////#BATAS DEFAULT#/////////
     #///////////////////////////////
     'corsheaders.middleware.CorsMiddleware',
+    'app.middleware.OneSessionPerUserMiddleware',
 ]
 
 ROOT_URLCONF = 'AN_OPEN_NETRA_BE.urls'

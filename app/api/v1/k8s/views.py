@@ -61,7 +61,12 @@ def GetPods(request):
     if request.method == 'GET':
         config.load_kube_config()
         v1 = client.CoreV1Api()
-        pods_list = v1.list_pod_for_all_namespaces()
+
+        # Derive namespace from the current user's username
+        user_namespace = f"{request.user.username}-namespace"
+
+        # List pods in the specific namespace
+        pods_list = v1.list_namespaced_pod(namespace=user_namespace)
 
         # Retrieve all network statuses in advance
         network_statuses = get_network_status_annotations()
@@ -183,10 +188,13 @@ def CreateNamespace(request):
 
 ###RELATED TO 5G COMPONENTS MANAGEMENT FEATURE###
 ###SINGLE CU - RESTART###
-def RestartSingleCU(request):
+def RestartSingleCU(request, namespace):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-cu", "--namespace", "test1"
+            "kubectl", "rollout", "restart", "deployment", "single-cu", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -194,8 +202,11 @@ def RestartSingleCU(request):
 ###SINGLE DU - RESTART###
 def RestartSingleDU(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-du", "--namespace", "test1"
+            "kubectl", "rollout", "restart", "deployment", "single-du", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -203,8 +214,11 @@ def RestartSingleDU(request):
 ###SINGLE UE - RESTART###
 def RestartSingleUE(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-nr-ue", "--namespace", "test1"
+            "kubectl", "rollout", "restart", "deployment", "single-ue", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -212,8 +226,11 @@ def RestartSingleUE(request):
 ###MULTIGNB CU - RESTART###
 def RestartMultignbCU(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-cu", "--namespace", "test2"
+            "kubectl", "rollout", "restart", "deployment", "multignb-cu", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -221,8 +238,11 @@ def RestartMultignbCU(request):
 ###MULTIGNB DU1 - RESTART###
 def RestartMultignbDU1(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-du-1", "--namespace", "test2"
+            "kubectl", "rollout", "restart", "deployment", "multignb-du1", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -230,8 +250,11 @@ def RestartMultignbDU1(request):
 ###MULTIGNB DU2 - RESTART###
 def RestartMultignbDU2(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-du-2", "--namespace", "test2"
+            "kubectl", "rollout", "restart", "deployment", "multignb-du2", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -239,8 +262,11 @@ def RestartMultignbDU2(request):
 ###MULTIGNB UE - RESTART###
 def RestartMultignbUE(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-nr-ue", "--namespace", "test2"
+            "kubectl", "rollout", "restart", "deployment", "multignb-ue", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -248,8 +274,11 @@ def RestartMultignbUE(request):
 ###MULTIUE CU - RESTART###
 def RestartMultiueCU(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-cu", "--namespace", "test3"
+            "kubectl", "rollout", "restart", "deployment", "multiue-cu", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -257,8 +286,11 @@ def RestartMultiueCU(request):
 ###MULTIUE DU - RESTART###
 def RestartMultiueDU(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+    
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-du", "--namespace", "test3"
+            "kubectl", "rollout", "restart", "deployment", "multiue-du", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -266,8 +298,11 @@ def RestartMultiueDU(request):
 ###MULTIUE UE1 - RESTART###
 def RestartMultiueUE1(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-nr-ue1", "--namespace", "test3"
+            "kubectl", "rollout", "restart", "deployment", "multiue-ue1", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
@@ -275,8 +310,11 @@ def RestartMultiueUE1(request):
 ###MULTIUE UE2 - RESTART###
 def RestartMultiueUE2(request):
     try:
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         subprocess.run([
-            "kubectl", "rollout", "restart", "deployment", "oai-nr-ue2", "--namespace", "test3"
+            "kubectl", "rollout", "restart", "deployment", "multiue-ue2", "--namespace", namespace
         ])
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")

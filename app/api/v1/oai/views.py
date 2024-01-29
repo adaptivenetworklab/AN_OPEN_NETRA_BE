@@ -4,6 +4,8 @@ from rest_framework.decorators import api_view
 import subprocess
 import yaml
 import os
+from app.models import UserProfile
+from django.views.decorators.csrf import csrf_exempt
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Default BASE_DIR located at v1 directory
@@ -56,140 +58,155 @@ def endpoints(request):
 
 
 ###CREATE ALL 5G COMPONENT NEEDED BY THE USER###
-def CreateAll5G(request):
-    try:
-        #SINGLE - CU
-        subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test1"
-        ], cwd=SINGLE_CU_BASE_DIR)
+def CreateAll5G(request, namespace):
+    try:        
+        user_profile = UserProfile.objects.get(user=request.user)
+        user_level = user_profile.level
 
-        #SINGLE - DU
-        subprocess.run([
-            "helm", "install", "gnb-du", "--values", "values-du.yaml",
-            ".", "--namespace", "test1"
-        ], cwd=SINGLE_DU_BASE_DIR)
+        if user_level == 1:
+            #SINGLE - CU
+            subprocess.run([
+                "helm", "install", "single-cu", "--values", "values-cu.yaml",
+                ".", "--namespace", namespace
+            ], cwd=SINGLE_CU_BASE_DIR)
 
-        #SINGLE - UE
-        subprocess.run([
-            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
-            ".", "--namespace", "test1"
-        ], cwd=SINGLE_UE_BASE_DIR)
+            #SINGLE - DU
+            subprocess.run([
+                "helm", "install", "single-du", "--values", "values-du.yaml",
+                ".", "--namespace", namespace
+            ], cwd=SINGLE_DU_BASE_DIR)
 
-        #MULTI-GNB - CU
-        subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test2"
-        ], cwd=MULTI_GNB_CU_BASE_DIR)
+            #SINGLE - UE
+            subprocess.run([
+                "helm", "install", "single-ue", "--values", "values-ue.yaml",
+                ".", "--namespace", namespace
+            ], cwd=SINGLE_UE_BASE_DIR)
 
-        #MULTI-GNB - DU1
-        subprocess.run([
-            "helm", "install", "gnb-du1", "--values", "values-du.yaml",
-            ".", "--namespace", "test2"
-        ], cwd=MULTI_GNB_DU1_BASE_DIR)
+        elif user_level == 2:
+            #MULTI-GNB - CU
+            subprocess.run([
+                "helm", "install", "multignb-cu", "--values", "values-cu.yaml",
+                ".", "--namespace", namespace
+            ], cwd=MULTI_GNB_CU_BASE_DIR)
 
-        #MULTI-GNB - DU2
-        subprocess.run([
-            "helm", "install", "gnb-du2", "--values", "values-du.yaml",
-            ".", "--namespace", "test2"
-        ], cwd=MULTI_GNB_DU2_BASE_DIR)
+            #MULTI-GNB - DU1
+            subprocess.run([
+                "helm", "install", "multignb-du1", "--values", "values-du.yaml",
+                ".", "--namespace", namespace
+            ], cwd=MULTI_GNB_DU1_BASE_DIR)
 
-        #MULTI-GNB - UE
-        subprocess.run([
-            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
-            ".", "--namespace", "test2"
-        ], cwd=MULTI_GNB_UE_BASE_DIR)
+            #MULTI-GNB - DU2
+            subprocess.run([
+                "helm", "install", "multignb-du2", "--values", "values-du.yaml",
+                ".", "--namespace", namespace
+            ], cwd=MULTI_GNB_DU2_BASE_DIR)
 
-        #MULTI-UE - CU
-        subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test3"
-        ], cwd=MULTI_UE_CU_BASE_DIR)
+            #MULTI-GNB - UE
+            subprocess.run([
+                "helm", "install", "multignb-ue", "--values", "values-ue.yaml",
+                ".", "--namespace", namespace
+            ], cwd=MULTI_GNB_UE_BASE_DIR)
 
-        #MULTI-UE - DU
-        subprocess.run([
-            "helm", "install", "gnb-du", "--values", "values-du.yaml",
-            ".", "--namespace", "test3"
-        ], cwd=MULTI_UE_DU_BASE_DIR)
+        elif user_level == 3:
+            #MULTI-UE - CU
+            subprocess.run([
+                "helm", "install", "multiue-cu", "--values", "values-cu.yaml",
+                ".", "--namespace", namespace
+            ], cwd=MULTI_UE_CU_BASE_DIR)
 
-        #MULTI-UE - UE1
-        subprocess.run([
-            "helm", "install", "nr-ue1", "--values", "values-ue.yaml",
-            ".", "--namespace", "test3"
-        ], cwd=MULTI_UE_UE1_BASE_DIR)
+            #MULTI-UE - DU
+            subprocess.run([
+                "helm", "install", "multiue-du", "--values", "values-du.yaml",
+                ".", "--namespace", namespace
+            ], cwd=MULTI_UE_DU_BASE_DIR)
 
-        #MULTI-UE - UE2
-        subprocess.run([
-            "helm", "install", "nr-ue2", "--values", "values-ue.yaml",
-            ".", "--namespace", "test3"
-        ], cwd=MULTI_UE_UE2_BASE_DIR)
+            #MULTI-UE - UE1
+            subprocess.run([
+                "helm", "install", "multiue-ue1", "--values", "values-ue.yaml",
+                ".", "--namespace", namespace
+            ], cwd=MULTI_UE_UE1_BASE_DIR)
 
-        return HttpResponse('User Successfully Created')
+            #MULTI-UE - UE2
+            subprocess.run([
+                "helm", "install", "multiue-ue2", "--values", "values-ue.yaml",
+                ".", "--namespace", namespace
+            ], cwd=MULTI_UE_UE2_BASE_DIR)
+
+        return "Success"
 
     except subprocess.CalledProcessError as e:
         # Handle errors in the subprocesses
-        return HttpResponse(f"An error occurred: {e}")
+        return f"An error occurred: {e}"
 
 
 ###DELETE ALL 5G COMPONENT ALONGSIDE USER ACCOUNT DELETION###
-def DeleteAll5G(request):
+def DeleteAll5G(request, namespace):
     try:
         #SINGLE - CU
         subprocess.run([
-            "helm", "delete", "gnb-cu", "--namespace", "test1"
+            "helm", "delete", "single-cu", "--namespace", namespace
         ])
 
         #SINGLE - DU
         subprocess.run([
-            "helm", "delete", "gnb-du", "--namespace", "test1"
+            "helm", "delete", "single-du", "--namespace", namespace
         ])
 
         #SINGLE - UE
         subprocess.run([
-            "helm", "delete", "nr-ue", "--namespace", "test1"
+            "helm", "delete", "single-ue", "--namespace", namespace
         ])
 
         #MULTI-GNB - CU
         subprocess.run([
-            "helm", "delete", "gnb-cu", "--namespace", "test2"
+            "helm", "delete", "multignb-cu", "--namespace", namespace
         ])
 
         #MULTI-GNB - DU1
         subprocess.run([
-            "helm", "delete", "gnb-du1", "--namespace", "test2"
+            "helm", "delete", "multignb-du1", "--namespace", namespace
         ])
 
         #MULTI-GNB - DU2
         subprocess.run([
-            "helm", "delete", "gnb-du2", "--namespace", "test2"
+            "helm", "delete", "multignb-du2", "--namespace", namespace
         ])
 
         #MULTI-GNB - UE
         subprocess.run([
-            "helm", "delete", "nr-ue", "--namespace", "test2"
+            "helm", "delete", "multignb-ue", "--namespace", namespace
         ])
 
         #MULTI-UE - CU
         subprocess.run([
-            "helm", "delete", "gnb-cu", "--namespace", "test3"
+            "helm", "delete", "multiue-cu", "--namespace", namespace
         ])
 
         #MULTI-UE - DU
         subprocess.run([
-            "helm", "delete", "gnb-du", "--namespace", "test3"
+            "helm", "delete", "multiue-du", "--namespace", namespace
         ])
 
         #MULTI-UE - UE1
         subprocess.run([
-            "helm", "delete", "nr-ue1", "--namespace", "test3"
+            "helm", "delete", "multiue-ue1", "--namespace", namespace
         ])
 
         #MULTI-UE - UE2
         subprocess.run([
-            "helm", "delete", "nr-ue2", "--namespace", "test3"
+            "helm", "delete", "multiue-ue2", "--namespace", namespace
         ])
 
-        return HttpResponse('User Successfully Deleted')
+        # Delete the role and rolebinding
+        role_name = f"{namespace}-role"
+        role_binding_name = f"{namespace}-rolebinding"
+        subprocess.run(["kubectl", "delete", "role", role_name, "--namespace", namespace])
+        subprocess.run(["kubectl", "delete", "rolebinding", role_binding_name, "--namespace", namespace])
+
+        # Delete the namespace
+        subprocess.run(["kubectl", "delete", "namespace", namespace])
+
+        return HttpResponse('Kubernetes resources successfully deleted')
 
     except subprocess.CalledProcessError as e:
         # Handle errors in the subprocesses
@@ -203,6 +220,9 @@ def ConfigSingleCU(request):
         multus_f1_int = request.POST.get('multus_f1_int')
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         # Load the existing YAML file
         with open(SINGLE_CU_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
@@ -216,13 +236,13 @@ def ConfigSingleCU(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-cu", "--namespace", "oai-gnb-ue"
+            "kubectl", "delete", "deployments", "single-cu", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "oai-gnb-ue"
+            "helm", "upgrade", "single-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", namespace
         ], cwd=SINGLE_CU_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -236,6 +256,9 @@ def ConfigSingleDU(request):
         multus_f1_int = request.POST.get('multus_f1_int')
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         # Load the existing YAML file
         with open(SINGLE_DU_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
@@ -249,13 +272,13 @@ def ConfigSingleDU(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-du", "--namespace", "oai-gnb-ue"
+            "kubectl", "delete", "deployments", "single-du", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "gnb-du", "--values", "values-du.yaml",
-            ".", "--namespace", "oai-gnb-ue"
+            "helm", "upgrade", "single-du", "--values", "values-du.yaml",
+            ".", "--namespace", namespace
         ], cwd=SINGLE_DU_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -270,6 +293,8 @@ def ConfigSingleUE(request):
         multus_netmask = request.POST.get('multus_netmask')
         multus_gateway = request.POST.get('multus_gateway')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
 
         # Load the existing YAML file
         with open(SINGLE_UE_VALUES_FILE_PATH, 'r') as file:
@@ -286,13 +311,13 @@ def ConfigSingleUE(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-nr-ue", "--namespace", "oai-gnb-ue"
+            "kubectl", "delete", "deployments", "single-ue", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "nr-ue", "--values", "values-ue.yaml",
-            ".", "--namespace", "oai-gnb-ue"
+            "helm", "upgrade", "single-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", namespace
         ], cwd=SINGLE_UE_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -307,6 +332,9 @@ def ConfigMultignbCU(request):
         multus_f1_int = request.POST.get('multus_f1_int')
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         # Load the existing YAML file
         with open(MULTI_GNB_CU_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
@@ -320,13 +348,13 @@ def ConfigMultignbCU(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-cu", "--namespace", "oai-multi-gnb"
+            "kubectl", "delete", "deployments", "multignb-cu", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "oai-multi-gnb"
+            "helm", "upgrade", "multignb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_GNB_CU_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -340,6 +368,9 @@ def ConfigMultignbDU1(request):
         multus_f1_int = request.POST.get('multus_f1_int')
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         # Load the existing YAML file
         with open(MULTI_GNB_DU1_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
@@ -353,13 +384,13 @@ def ConfigMultignbDU1(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-du1", "--namespace", "oai-multi-gnb"
+            "kubectl", "delete", "deployments", "multignb-du1", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "gnb-du1", "--values", "values-du.yaml",
-            ".", "--namespace", "oai-multi-gnb"
+            "helm", "upgrade", "multignb-du1", "--values", "values-du.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_GNB_DU1_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -373,6 +404,9 @@ def ConfigMultignbDU2(request):
         multus_f1_int = request.POST.get('multus_f1_int')
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         # Load the existing YAML file
         with open(MULTI_GNB_DU2_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
@@ -386,13 +420,13 @@ def ConfigMultignbDU2(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-du2", "--namespace", "oai-multi-gnb"
+            "kubectl", "delete", "deployments", "multignb-du2", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "gnb-du2", "--values", "values-du.yaml",
-            ".", "--namespace", "oai-multi-gnb"
+            "helm", "upgrade", "multignb-du2", "--values", "values-du.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_GNB_DU2_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -407,6 +441,8 @@ def ConfigMultignbUE(request):
         multus_netmask = request.POST.get('multus_netmask')
         multus_gateway = request.POST.get('multus_gateway')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
 
         # Load the existing YAML file
         with open(MULTI_GNB_UE_VALUES_FILE_PATH, 'r') as file:
@@ -423,13 +459,13 @@ def ConfigMultignbUE(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-nr-ue", "--namespace", "oai-multi-gnb"
+            "kubectl", "delete", "deployments", "multignb-ue", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "nr-ue", "--values", "values-ue.yaml",
-            ".", "--namespace", "oai-multi-gnb"
+            "helm", "upgrade", "multignb-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_GNB_UE_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -444,6 +480,9 @@ def ConfigMultiueCU(request):
         multus_f1_int = request.POST.get('multus_f1_int')
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         # Load the existing YAML file
         with open(MULTI_UE_CU_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
@@ -457,13 +496,13 @@ def ConfigMultiueCU(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-cu", "--namespace", "oai-multi-ue"
+            "kubectl", "delete", "deployments", "multiue-cu", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "oai-multi-ue"
+            "helm", "upgrade", "multiue-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_UE_CU_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -477,6 +516,9 @@ def ConfigMultiueDU(request):
         multus_f1_int = request.POST.get('multus_f1_int')
         multus_f1_netmask = request.POST.get('multus_f1_netmask')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
+
         # Load the existing YAML file
         with open(MULTI_UE_DU_VALUES_FILE_PATH, 'r') as file:
             values_data = yaml.safe_load(file)
@@ -490,13 +532,13 @@ def ConfigMultiueDU(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-du", "--namespace", "oai-multi-ue"
+            "kubectl", "delete", "deployments", "multiue-du", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "gnb-du", "--values", "values-du.yaml",
-            ".", "--namespace", "oai-multi-ue"
+            "helm", "upgrade", "multiue-du", "--values", "values-du.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_UE_DU_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -511,6 +553,8 @@ def ConfigMultiueUE1(request):
         multus_netmask = request.POST.get('multus_netmask')
         multus_gateway = request.POST.get('multus_gateway')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
 
         # Load the existing YAML file
         with open(MULTI_UE_UE1_VALUES_FILE_PATH, 'r') as file:
@@ -527,13 +571,13 @@ def ConfigMultiueUE1(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-nr-ue1", "--namespace", "oai-multi-ue"
+            "kubectl", "delete", "deployments", "multiue-ue1", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "nr-ue1", "--values", "values-ue.yaml",
-            ".", "--namespace", "oai-multi-ue"
+            "helm", "upgrade", "multiue-ue1", "--values", "values-ue.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_UE_UE1_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -548,6 +592,8 @@ def ConfigMultiueUE2(request):
         multus_netmask = request.POST.get('multus_netmask')
         multus_gateway = request.POST.get('multus_gateway')
         
+        # Derive the namespace from the current user's username
+        namespace = f"{request.user.username}-namespace"
 
         # Load the existing YAML file
         with open(MULTI_UE_UE2_VALUES_FILE_PATH, 'r') as file:
@@ -564,13 +610,13 @@ def ConfigMultiueUE2(request):
             yaml.dump(values_data, file)
 
         subprocess.run([
-            "kubectl", "delete", "deployments", "oai-nr-ue2", "--namespace", "oai-multi-ue"
+            "kubectl", "delete", "deployments", "multiue-ue2", "--namespace", namespace
         ])
 
         # Execute Helm install command (Example: helm install my-release ./my-chart -f values.yaml)
         subprocess.run([
-            "helm", "upgrade", "nr-ue2", "--values", "values-ue.yaml",
-            ".", "--namespace", "oai-multi-ue"
+            "helm", "upgrade", "multiue-ue2", "--values", "values-ue.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_UE_UE2_BASE_DIR)
         
         return HttpResponse("Configuration Updated Successfully")
@@ -581,9 +627,12 @@ def ConfigMultiueUE2(request):
 ###SINGLE CU - START###
 def StartSingleCU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test1"
+            "helm", "install", "single-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", namespace
         ], cwd=SINGLE_CU_BASE_DIR)
         return HttpResponse("CU started")
     except subprocess.CalledProcessError as e:
@@ -592,9 +641,12 @@ def StartSingleCU(request):
 ###SINGLE DU - START###
 def StartSingleDU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "gnb-du", "--values", "values-du.yaml",
-            ".", "--namespace", "test1"
+            "helm", "install", "single-du", "--values", "values-du.yaml",
+            ".", "--namespace", namespace
         ], cwd=SINGLE_DU_BASE_DIR)
         return HttpResponse("DU started")
     except subprocess.CalledProcessError as e:
@@ -603,9 +655,12 @@ def StartSingleDU(request):
 ###SINGLE UE - START###
 def StartSingleUE(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
-            ".", "--namespace", "test1"
+            "helm", "install", "single-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", namespace
         ], cwd=SINGLE_UE_BASE_DIR)
         return HttpResponse("UE started")
     except subprocess.CalledProcessError as e:
@@ -614,9 +669,12 @@ def StartSingleUE(request):
 ###MULTIGNB CU - START###
 def StartMultignbCU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test2"
+            "helm", "install", "multignb-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_GNB_CU_BASE_DIR)
         return HttpResponse("CU started")
     except subprocess.CalledProcessError as e:
@@ -625,9 +683,12 @@ def StartMultignbCU(request):
 ###MULTIGNB DU1 - START###
 def StartMultignbDU1(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "gnb-du1", "--values", "values-du.yaml",
-            ".", "--namespace", "test2"
+            "helm", "install", "multignb-du1", "--values", "values-du.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_GNB_DU1_BASE_DIR)
         return HttpResponse("DU1 started")
     except subprocess.CalledProcessError as e:
@@ -636,9 +697,12 @@ def StartMultignbDU1(request):
 ###MULTIGNB DU2 - START###
 def StartMultignbDU2(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "gnb-du2", "--values", "values-du.yaml",
-            ".", "--namespace", "test2"
+            "helm", "install", "multignb-du2", "--values", "values-du.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_GNB_DU2_BASE_DIR)
         return HttpResponse("DU2 started")
     except subprocess.CalledProcessError as e:
@@ -647,9 +711,12 @@ def StartMultignbDU2(request):
 ###MULTIGNB UE - START###
 def StartMultignbUE(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "nr-ue", "--values", "values-ue.yaml",
-            ".", "--namespace", "test2"
+            "helm", "install", "multignb-ue", "--values", "values-ue.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_GNB_UE_BASE_DIR)
         return HttpResponse("UE started")
     except subprocess.CalledProcessError as e:
@@ -658,9 +725,12 @@ def StartMultignbUE(request):
 ###MULTIUE CU - START###
 def StartMultiueCU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "gnb-cu", "--values", "values-cu.yaml",
-            ".", "--namespace", "test3"
+            "helm", "install", "multiue-cu", "--values", "values-cu.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_UE_CU_BASE_DIR)
         return HttpResponse("CU started")
     except subprocess.CalledProcessError as e:
@@ -669,9 +739,12 @@ def StartMultiueCU(request):
 ###MULTIUE DU - START###
 def StartMultiueDU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "gnb-du", "--values", "values-du.yaml",
-            ".", "--namespace", "test3"
+            "helm", "install", "multiue-du", "--values", "values-du.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_UE_DU_BASE_DIR)
         return HttpResponse("DU started")
     except subprocess.CalledProcessError as e:
@@ -680,9 +753,12 @@ def StartMultiueDU(request):
 ###MULTIUE UE1 - START###
 def StartMultiueUE1(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "nr-ue1", "--values", "values-ue.yaml",
-            ".", "--namespace", "test3"
+            "helm", "install", "multiue-ue1", "--values", "values-ue.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_UE_UE1_BASE_DIR)
         return HttpResponse("UE1 started")
     except subprocess.CalledProcessError as e:
@@ -691,9 +767,12 @@ def StartMultiueUE1(request):
 ###MULTIUE UE2 - START###
 def StartMultiueUE2(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "install", "nr-ue2", "--values", "values-ue.yaml",
-            ".", "--namespace", "test3"
+            "helm", "install", "multiue-ue2", "--values", "values-ue.yaml",
+            ".", "--namespace", namespace
         ], cwd=MULTI_UE_UE2_BASE_DIR)
         return HttpResponse("UE2 started")
     except subprocess.CalledProcessError as e:
@@ -703,8 +782,11 @@ def StartMultiueUE2(request):
 ###SINGLE CU - STOP###
 def StopSingleCU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "gnb-cu", "--namespace", "test1"
+            "helm", "delete", "single-cu", "--namespace", namespace
         ])
         return HttpResponse("CU stopped")
     except subprocess.CalledProcessError as e:
@@ -713,8 +795,11 @@ def StopSingleCU(request):
 ###SINGLE DU - STOP###
 def StopSingleDU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "gnb-du", "--namespace", "test1"
+            "helm", "delete", "gnb-du", "--namespace", namespace
         ])
         return HttpResponse("DU stopped")
     except subprocess.CalledProcessError as e:
@@ -723,8 +808,11 @@ def StopSingleDU(request):
 ###SINGLE UE - STOP###
 def StopSingleUE(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "nr-ue", "--namespace", "test1"
+            "helm", "delete", "nr-ue", "--namespace", namespace
         ])
         return HttpResponse("UE stopped")
     except subprocess.CalledProcessError as e:
@@ -733,8 +821,11 @@ def StopSingleUE(request):
 ###MULTIGNB CU - STOP###
 def StopMultignbCU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "gnb-cu", "--namespace", "test2"
+            "helm", "delete", "gnb-cu", "--namespace", namespace
         ])
         return HttpResponse("CU stopped")
     except subprocess.CalledProcessError as e:
@@ -743,8 +834,11 @@ def StopMultignbCU(request):
 ###MULTIGNB DU1 - STOP###
 def StopMultignbDU1(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "gnb-du1", "--namespace", "test2"
+            "helm", "delete", "gnb-du1", "--namespace", namespace
         ])
         return HttpResponse("DU1 stopped")
     except subprocess.CalledProcessError as e:
@@ -753,8 +847,11 @@ def StopMultignbDU1(request):
 ###MULTIGNB DU2 - STOP###
 def StopMultignbDU2(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "gnb-du2", "--namespace", "test2"
+            "helm", "delete", "gnb-du2", "--namespace", namespace
         ])
         return HttpResponse("DU2 stopped")
     except subprocess.CalledProcessError as e:
@@ -763,8 +860,11 @@ def StopMultignbDU2(request):
 ###MULTIGNB UE - STOP###
 def StopMultignbUE(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "nr-ue", "--namespace", "test2"
+            "helm", "delete", "nr-ue", "--namespace", namespace
         ])
         return HttpResponse("UE stopped")
     except subprocess.CalledProcessError as e:
@@ -773,8 +873,11 @@ def StopMultignbUE(request):
 ###MULTIUE CU - STOP###
 def StopMultiueCU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "gnb-cu", "--namespace", "test3"
+            "helm", "delete", "gnb-cu", "--namespace", namespace
         ])
         return HttpResponse("CU stopped")
     except subprocess.CalledProcessError as e:
@@ -783,8 +886,11 @@ def StopMultiueCU(request):
 ###MULTIUE DU - STOP###
 def StopMultiueDU(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "gnb-du", "--namespace", "test3"
+            "helm", "delete", "gnb-du", "--namespace", namespace
         ])
         return HttpResponse("DU stopped")
     except subprocess.CalledProcessError as e:
@@ -793,8 +899,11 @@ def StopMultiueDU(request):
 ###MULTIUE UE1 - STOP###
 def StopMultiueUE1(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "nr-ue1", "--namespace", "test3"
+            "helm", "delete", "nr-ue1", "--namespace", namespace
         ])
         return HttpResponse("UE1 stopped")
     except subprocess.CalledProcessError as e:
@@ -803,8 +912,11 @@ def StopMultiueUE1(request):
 ###MULTIUE UE2 - STOP###
 def StopMultiueUE2(request):
     try:
+        username = request.user.username  # Get the currently logged-in user's username
+        namespace = f"{username}-namespace"  # Construct the namespace based on the username
+
         subprocess.run([
-            "helm", "delete", "nr-ue2", "--namespace", "test3"
+            "helm", "delete", "nr-ue2", "--namespace", namespace
         ])
         return HttpResponse("UE2 stopped")
     except subprocess.CalledProcessError as e:

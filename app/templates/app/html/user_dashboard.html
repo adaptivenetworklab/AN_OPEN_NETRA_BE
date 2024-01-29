@@ -4,52 +4,446 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     
-    <title>Open Netra Dashboard</title>
+    <title>Open Netra - Dashboard</title>
+    <style>
+      ::-webkit-scrollbar {
+          width: 5px; /* width of the entire scrollbar */
+      }
+
+      ::-webkit-scrollbar-track {
+          background: #f1f1f1; /* color of the tracking area */
+      }
+
+      ::-webkit-scrollbar-thumb {
+          background: #888; /* color of the scroll thumb */
+          border-radius: 10px; /* roundness of the scroll thumb */
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+          background: #555; /* color when hovering over the scroll thumb */
+      }
+
+      body {
+          font-family: 'Poppins', sans-serif;
+          background-color: #f4f4f4;
+          color: #333;
+          margin: 0;
+          padding-top: 40px; /* Adjust padding to ensure content is not hidden under navbar */
+      }
+      .navbar {
+          background-color: #5D3B8C; /* Dark Purple */
+          color: white;
+          text-align: center;
+          width: 100.3%;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 1000;
+          padding: 10.5px 0; /* Adjust padding for navbar height */
+      }
+      .navbar a {
+          color: white;
+          padding: 10px 20px;
+          text-decoration: none;
+          transition: background-color 0.3s, color 0.3s;
+          font-size: 16px;
+      }
+      .navbar a:hover {
+          background-color: #E75480; /* Pink */
+          color: white;
+      }
+      .dashboard-container {
+          display: flex;
+          margin-top: 20px; /* Adjusted margin to accommodate fixed navbar */
+      }
+      .control-panel, .config-panel {
+          padding: 10px;
+          background-color: #fff;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+      .control-panel {
+        background-color: #f9f9f9; 
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-right: 10px; /* Increase spacing between panels */
+      }
+      .control-panel h5 {
+        color: #5D3B8C; /* Dark Purple */
+        margin-bottom: 0px;
+      }
+      .w3-row {
+        margin-bottom: 15px;
+      }
+      .config-panel {
+          flex: 2;
+      }
+      h5 {
+          color: #5D3B8C; /* Dark Purple */
+      }
+      .w3-button {
+          border: none;
+          border-radius: 5px;
+          padding: 10px 15px;
+          margin: 5px;
+          text-align: center;
+          transition: background-color 0.3s;
+      }
+      .w3-button:hover {
+          opacity: 0.8;
+      }
+      .topology-section {
+          background-color: #adf1b1; 
+          width: 100%;
+          height: 300px;
+          margin-top: 20px;
+          border-radius: 5px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+  </style>
   </head>
   <body>
     <div class="w3-container">
-      <div class="w3-bar w3-border w3-light-grey">
-        <div class="w3-bar-item"><a href="{% url 'introduction' %}" class="btn btn-primary">Introduction</a></div>
-        <div class="w3-bar-item"><a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a></div>
-        <div class="w3-bar-item"><a href="{% url 'monitoring' %}" class="btn btn-primary">Monitoring</a></div>
-        <div class="w3-bar-item"><a href="{% url 'logout' %}" class="btn btn-primary">Logout</a></div>
+      <div class="navbar">
+        <a href="{% url 'introduction' %}">Introduction</a>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'monitoring' %}">Monitoring</a>
+        <a href="{% url 'logout' %}">Sign Out</a>
       </div>
-      <!-- Component Controls -->
-      <div class="w3-container w3-margin-top">
-        <!-- CU Controls -->
-        <div class="w3-row w3-margin-bottom">
-            <h3>CU Controls</h3>
-            <a href="{% url 'single-cu-start' %}" class="w3-button w3-green">Start CU</a>
-            <a href="{% url 'single-cu-stop' %}" class="w3-button w3-red">Stop CU</a>
-            <a href="{% url 'single-cu-restart' %}" class="w3-button w3-blue">Restart CU</a>
-        </div>
-
-        <!-- DU Controls -->
-        <div class="w3-row w3-margin-bottom">
-            <h3>DU Controls</h3>
-            <a href="{% url 'single-du-start' %}" class="w3-button w3-green">Start DU</a>
-            <a href="{% url 'single-du-stop' %}" class="w3-button w3-red">Stop DU</a>
-            <a href="{% url 'single-du-restart' %}" class="w3-button w3-blue">Restart DU</a>
-        </div>
-
-        <!-- RU Controls -->
-        <div class="w3-row w3-margin-bottom">
-          <h3>RU Controls</h3>
-          <a href="{% url 'single-ru-start' %}" class="w3-button w3-green">Start RU</a>
-          <a href="{% url 'single-ru-stop' %}" class="w3-button w3-red">Stop RU</a>
-          <a href="{% url 'single-ru-restart' %}" class="w3-button w3-blue">Restart RU</a>
+      <div class="topology-section">
+        <!-- Placeholder for 5G End-to-End Topology -->
       </div>
+      <div class="dashboard-container">
+        <!-- Component Controls -->
+        <div class="control-panel">
+          <h5>Component Controls</h5>
+          {% if user_level == 1 %}
+          <!-- Single CU Controls -->
+          <div class="w3-row w3-margin-bottom">
+            <h5>CU</h5>
+            {% if single_cu_exists %}
+              <a href="{% url 'single-cu-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'single-cu-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'single-cu-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
 
-        <!-- UE Controls -->
-        <div class="w3-row">
-            <h3>UE Controls</h3>
-            <a href="{% url 'single-ue-start' %}" class="w3-button w3-green">Start UE</a>
-            <a href="{% url 'single-ue-stop' %}" class="w3-button w3-red">Stop UE</a>
-            <a href="{% url 'single-ue-restart' %}" class="w3-button w3-blue">Restart UE</a>
+          <!-- Single DU Controls -->
+          <div class="w3-row w3-margin-bottom">
+              <h5>DU</h5>
+              {% if single_du_exists %}
+                <a href="{% url 'single-du-stop' %}" class="w3-button w3-red">Stop</a>
+              {% else %}
+                <a href="{% url 'single-du-start' %}" class="w3-button w3-green">Start</a>
+              {% endif %}
+              <a href="{% url 'single-du-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- Single RU Controls -->
+          <div class="w3-row w3-margin-bottom">
+            <h5>RU</h5>
+            {% if single_ru_exists %}
+              <a href="{% url 'single-ru-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'single-ru-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'single-ru-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- Single UE Controls -->
+          <div class="w3-row">
+              <h5>UE</h5>
+              {% if single_ue_exists %}
+                <a href="{% url 'single-ue-stop' %}" class="w3-button w3-red">Stop</a>
+              {% else %}
+                <a href="{% url 'single-ue-start' %}" class="w3-button w3-green">Start</a>
+              {% endif %}
+              <a href="{% url 'single-ue-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          {% elif user_level == 2 %}
+          <!-- MultiGNB CU Controls -->
+          <div class="w3-row w3-margin-bottom">
+              <h5>CU</h5>
+              {% if multignb_cu_exists %}
+                <a href="{% url 'single-cu-stop' %}" class="w3-button w3-red">Stop</a>
+              {% else %}
+                <a href="{% url 'single-cu-start' %}" class="w3-button w3-green">Start</a>
+              {% endif %}
+              <a href="{% url 'single-cu-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- MultiGNB DU1 Controls -->
+          <div class="w3-row w3-margin-bottom">
+              <h5>DU1</h5>
+              {% if multignb_du1_exists %}
+                <a href="{% url 'multignb-du1-stop' %}" class="w3-button w3-red">Stop</a>
+              {% else %}
+                <a href="{% url 'multignb-du1-start' %}" class="w3-button w3-green">Start</a>
+              {% endif %}
+              <a href="{% url 'multignb-du1-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- MultiGNB DU2 Controls -->
+          <div class="w3-row w3-margin-bottom">
+            <h5>DU2</h5>
+            {% if multignb_du2_exists %}
+              <a href="{% url 'multignb-du2-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multignb-du2-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multignb-du2-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- MultigGNB RU1 Controls -->
+          <div class="w3-row w3-margin-bottom">
+            <h5>RU1</h5>
+            {% if multignb_ru1_exists %}
+              <a href="{% url 'multignb-ru1-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multignb-ru1-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multignb-ru1-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- MultigGNB RU2 Controls -->
+          <div class="w3-row w3-margin-bottom">
+            <h5>RU2</h5>
+            {% if multignb_ru2_exists %}
+              <a href="{% url 'multignb-ru2-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multignb-ru2-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multignb-ru2-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- MultiGNB UE Controls -->
+          <div class="w3-row">
+            <h5>UE</h5>
+            {% if multignb_ue_exists %}
+              <a href="{% url 'multignb-ue-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multignb-ue-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multignb-ue-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          {% elif user_level == 3 %}
+          <!-- MultiUE CU Controls -->
+          <div class="w3-row w3-margin-bottom">
+            <h5>CU</h5>
+            {% if multiue_cu_exists %}
+              <a href="{% url 'multiue-cu-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multiue-cu-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multiue-cu-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- MultiUE DU Controls -->
+          <div class="w3-row w3-margin-bottom">
+            <h5>DU</h5>
+            {% if multiue_du_exists %}
+              <a href="{% url 'multiue-du-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multiue-du-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multiue-du-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- MultiUE RU Controls -->
+          <div class="w3-row w3-margin-bottom">
+            <h5>RU</h5>
+            {% if multiue_ru_exists %}
+              <a href="{% url 'multiue-ru-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multiue-ru-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multiue-ru-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+
+          <!-- MultiUE UE1 Controls -->
+          <div class="w3-row">
+            <h5>UE1</h5>
+            {% if multiue_ue1_exists %}
+              <a href="{% url 'multiue-ue1-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multiue-ue1-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multiue-ue1-restart' %}" class="w3-button w3-blue">Restart</a>
+        </div>
+          <!-- MultiUE UE2 Controls -->
+          <div class="w3-row">
+            <h5>UE2</h5>
+            {% if multiue_ue2_exists %}
+              <a href="{% url 'multiue-ue2-stop' %}" class="w3-button w3-red">Stop</a>
+            {% else %}
+              <a href="{% url 'multiue-ue2-start' %}" class="w3-button w3-green">Start</a>
+            {% endif %}
+            <a href="{% url 'multiue-ue2-restart' %}" class="w3-button w3-blue">Restart</a>
+          </div>
+          {% endif %}
+        </div>
+        <div class="config-panel">
+          <h5>Component Configuration</h5>
+          <form method="post">
+            {% csrf_token %}
+            <label for="component-select">Select Component:</label><br>
+            <select id="component-select" name="component" onchange="showConfigForm(this.value)">
+              <option value="">--Select a Component--</option>
+              {% if user_level == 1 %}
+                <option value="single-cu">CU</option>
+                <option value="single-du">DU</option>
+                <option value="single-ue">UE</option>
+              {% elif user_level == 2 %}
+                <option value="multignb-cu">CU</option>
+                <option value="multignb-du1">DU1</option>
+                <option value="multignb-du2">DU2</option>
+                <option value="multignb-ue">UE</option>
+              {% elif user_level == 3 %}
+                <option value="multiue-cu">CU</option>
+                <option value="multiue-du">DU</option>
+                <option value="multiue-ue1">UE1</option>
+                <option value="multiue-ue2">UE2</option>
+              {% endif %}
+            </select><br><br>
+
+            <div id="single-cu-config" style="display: none;">
+              <label for="multus_f1_int">f1 Interface IPadd:</label><br>
+              <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface"><br>
+
+              <label for="multus_f1_netmask">f1 Interface Netmask:</label><br>
+              <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask"><br>
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="single-du-config" style="display: none;">
+              <label for="multus_f1_int">f1 Interface IPadd:</label><br>
+              <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface"><br>
+      
+              <label for="multus_f1_netmask">f1 Interface Netmask:</label><br>
+              <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask"><br>
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="single-ue-config" style="display: none;">
+              <label for="multus_int"> Multus Interface IPadd:</label><br>
+              <input type="text" id="multus_int" name="multus_int" placeholder="Multus Interface"><br>
+      
+              <label for="multus_netmask">Multus Interface Netmask:</label><br>
+              <input type="text" id="multus_netmask" name="multus_netmask" placeholder="Multus netmask"><br>
+      
+              <label for="multus_gateway">Multus Interface Default Gateway:</label><br>
+              <input type="text" id="multus_gateway" name="multus_gateway" placeholder="Multus Gateway"><br>
+      
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="multignb-cu-config" style="display: none;">
+              <label for="multus_f1_int">f1 Interface IPadd:</label><br>
+              <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface"><br>
+
+              <label for="multus_f1_netmask">f1 Interface Netmask:</label><br>
+              <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask"><br>
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="multignb-du1-config" style="display: none;">
+              <label for="multus_f1_int">f1 Interface IPadd:</label><br>
+              <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface"><br>
+      
+              <label for="multus_f1_netmask">f1 Interface Netmask:</label><br>
+              <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask"><br>
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="multignb-du2-config" style="display: none;">
+              <label for="multus_f1_int">f1 Interface IPadd:</label><br>
+              <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface"><br>
+      
+              <label for="multus_f1_netmask">f1 Interface Netmask:</label><br>
+              <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask"><br>
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="multignb-ue-config" style="display: none;">
+              <label for="multus_int"> Multus Interface IPadd:</label><br>
+              <input type="text" id="multus_int" name="multus_int" placeholder="Multus Interface"><br>
+      
+              <label for="multus_netmask">Multus Interface Netmask:</label><br>
+              <input type="text" id="multus_netmask" name="multus_netmask" placeholder="Multus netmask"><br>
+      
+              <label for="multus_gateway">Multus Interface Default Gateway:</label><br>
+              <input type="text" id="multus_gateway" name="multus_gateway" placeholder="Multus Gateway"><br>
+      
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="multiue-cu-config" style="display: none;">
+              <label for="multus_f1_int">f1 Interface IPadd:</label><br>
+              <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface"><br>
+      
+              <label for="multus_f1_netmask">f1 Interface Netmask:</label><br>
+              <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask"><br>
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="multiue-du-config" style="display: none;">
+              <label for="multus_f1_int">f1 Interface IPadd:</label><br>
+              <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface"><br>
+      
+              <label for="multus_f1_netmask">f1 Interface Netmask:</label><br>
+              <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask"><br>
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="multiue-ue1-config" style="display: none;">
+              <label for="multus_int"> Multus Interface IPadd:</label><br>
+              <input type="text" id="multus_int" name="multus_int" placeholder="Multus Interface"><br>
+      
+              <label for="multus_netmask">Multus Interface Netmask:</label><br>
+              <input type="text" id="multus_netmask" name="multus_netmask" placeholder="Multus netmask"><br>
+      
+              <label for="multus_gateway">Multus Interface Default Gateway:</label><br>
+              <input type="text" id="multus_gateway" name="multus_gateway" placeholder="Multus Gateway"><br>
+      
+              <input type="submit" value="Update Config">
+            </div>
+
+            <div id="multiue-ue2-config" style="display: none;">
+              <label for="multus_int"> Multus Interface IPadd:</label><br>
+              <input type="text" id="multus_int" name="multus_int" placeholder="Multus Interface"><br>
+      
+              <label for="multus_netmask">Multus Interface Netmask:</label><br>
+              <input type="text" id="multus_netmask" name="multus_netmask" placeholder="Multus netmask"><br>
+      
+              <label for="multus_gateway">Multus Interface Default Gateway:</label><br>
+              <input type="text" id="multus_gateway" name="multus_gateway" placeholder="Multus Gateway"><br>
+      
+              <input type="submit" value="Update Config">
+            </div>
+
+          </form>
         </div>
       </div>
     </div>
+    <script>
+      function showConfigForm(component) {
+        var components = ["single-cu", "single-du", "single-ue", "multignb-cu", "multignb-du1"
+        , "multignb-du2", "multignb-ue", "multiue-cu", "multiue-du", "multiue-ue1", "multiue-ue2"]; // Add more component IDs as needed
+        components.forEach(function(comp) {
+          document.getElementById(comp + "-config").style.display = "none";
+        });
+        if (component) {
+          document.getElementById(component + "-config").style.display = "block";
+        }
+      }
+    </script>
   </body>
 </html>
