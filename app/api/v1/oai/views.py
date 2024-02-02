@@ -799,7 +799,7 @@ def StopSingleDU(request):
         namespace = f"{username}-namespace"  # Construct the namespace based on the username
 
         subprocess.run([
-            "helm", "delete", "gnb-du", "--namespace", namespace
+            "helm", "delete", "single-du", "--namespace", namespace
         ])
         return HttpResponse("DU stopped")
     except subprocess.CalledProcessError as e:
