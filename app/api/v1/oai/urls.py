@@ -3,6 +3,19 @@ from . import views
 
 urlpatterns = [
     path('', views.endpoints, name='endpoints'),
+
+    path('values-single-cu', views.ValuesSingleCU, name='values-single-cu'),
+    path('values-single-du', views.ValuesSingleDU, name='values-single-du'),
+    path('values-single-ue', views.ValuesSingleUE, name='values-single-ue'),
+    path('values-multignb-cu', views.ValuesMultignbCU, name='values-multignb-cu'),
+    path('values-multignb-du1', views.ValuesMultignbDU1, name='values-multignb-du1'),
+    path('values-multignb-du2', views.ValuesMultignbDU2, name='values-multignb-du2'),
+    path('values-multignb-ue', views.ValuesMultignbUE, name='values-multignb-ue'),
+    path('values-multiue-cu', views.ValuesMultiueCU, name='values-multiue-cu'),
+    path('values-multiue-du', views.ValuesMultiueDU, name='values-multiue-du'),
+    path('values-multiue-ue1', views.ValuesMultiueUE1, name='values-multiue-ue1'),
+    path('values-multiue-ue2', views.ValuesMultiueUE2, name='values-multiue-ue2'),
+
     path('single-cu-config', views.ConfigSingleCU, name='single-cu-config'),
     path('single-du-config', views.ConfigSingleDU, name='single-du-config'),
     path('single-ue-config', views.ConfigSingleUE, name='single-ue-config'),
@@ -49,4 +62,6 @@ urlpatterns = [
 
     path('create-all-5g', views.CreateAll5G, name='create-all-5g'),
     path('delete-all-5g', views.DeleteAll5G, name='delete-all-5g'),
+
+
 ]

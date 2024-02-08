@@ -376,7 +376,7 @@
               <a href="{% url 'multiue-ue1-start' %}" class="w3-button w3-green">Start</a>
             {% endif %}
             <a href="{% url 'multiue-ue1-restart' %}" class="w3-button w3-blue">Restart</a>
-        </div>
+          </div>
           <!-- MultiUE UE2 Management -->
           <div class="w3-row">
             <h6>UE2</h6>
@@ -393,9 +393,9 @@
           <h5>Components Configuration</h5>
           {% csrf_token %}
           {% if user_level == 1 %}
-            <button onclick="showConfigForm('single-cu', this)">CU</button>
-            <button onclick="showConfigForm('single-du', this)">DU</button>
-            <button onclick="showConfigForm('single-ue', this)">UE</button>
+          <button data-component="single-cu" onclick="showConfigForm('single-cu', this)">CU</button>
+          <button data-component="single-du" onclick="showConfigForm('single-du', this)">DU</button>
+          <button data-component="single-ue" onclick="showConfigForm('single-ue', this)">UE</button>
           {% elif user_level == 2 %}
             <button onclick="showConfigForm('multignb-cu', this)">CU</button>
             <button onclick="showConfigForm('multignb-du1', this)">DU1</button>
@@ -408,35 +408,129 @@
             <button onclick="showConfigForm('multiue-ue2', this)">UE2</button>
           {% endif %}
 
-          <div id="single-cu-config" class="config-form">
-            <label for="multus_f1_int">f1 Interface IPadd:</label>
-            <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface">
-            <br>
-            <label for="multus_f1_netmask">f1 Interface Netmask:</label>
-            <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask">
-            <input type="submit" value="Update Config">
-          </div>
+          <form action="{% url 'single-cu-config' %}" method="post">
+            {% csrf_token %}
+            <div id="single-cu-config" class="config-form">
+              <label for="cu_name">CU Name:</label>
+              <input type="text" id="cu_name" name="cu_name" placeholder="">
 
-          <div id="single-du-config" class="config-form">
-            <label for="multus_f1_int">f1 Interface IPadd:</label>
-            <input type="text" id="multus_f1_int" name="multus_f1_int" placeholder="f1 Interface">
-            <br>
-            <label for="multus_f1_netmask">f1 Interface Netmask:</label>
-            <input type="text" id="multus_f1_netmask" name="multus_f1_netmask" placeholder="f1 netmask">
-            <input type="submit" value="Update Config">
-          </div>
+              <label for="f1_ifname">f1 Interface Name:</label>
+              <input type="text" id="f1_ifname" name="f1_ifname" placeholder="">
 
-          <div id="single-ue-config" class="config-form">
-            <label for="multus_int"> Multus Interface IPadd:</label>
-            <input type="text" id="multus_int" name="multus_int" placeholder="Multus Interface">
-            <br>
-            <label for="multus_netmask">Multus Interface Netmask:</label>
-            <input type="text" id="multus_netmask" name="multus_netmask" placeholder="Multus netmask">
-            <br>
-            <label for="multus_gateway">Multus Interface Default Gateway:</label>
-            <input type="text" id="multus_gateway" name="multus_gateway" placeholder="Multus Gateway">
-            <input type="submit" value="Update Config">
-          </div>
+              <label for="f1_int">f1 Interface IP Address:</label>
+              <input type="text" id="f1_int" name="f1_int" placeholder="">
+
+              <label for="f1_cuport">f1 CU Port:</label>
+              <input type="text" id="f1_cuport" name="f1_cuport" placeholder="">
+
+              <label for="f1_duport">f1 DU Port:</label>
+              <input type="text" id="f1_duport" name="f1_duport" placeholder="">
+
+              <label for="n2_ifname">n2 Interface Name:</label>
+              <input type="text" id="n2_ifname" name="n2_ifname" placeholder="">
+
+              <label for="n2_int">n2 Interface IP Address:</label>
+              <input type="text" id="n2_int" name="n2_int" placeholder="">
+
+              <label for="n3_ifname">n3 Interface Name:</label>
+              <input type="text" id="n3_ifname" name="n3_ifname" placeholder="">
+
+              <label for="n3_int">n3 Interface IP Address:</label>
+              <input type="text" id="n3_int" name="n3_int" placeholder="">
+
+              <label for="mcc">mcc:</label>
+              <input type="text" id="mcc" name="mcc" placeholder="">
+
+              <label for="mnc">mnc:</label>
+              <input type="text" id="mnc" name="mnc" placeholder="">
+
+              <label for="tac">tac:</label>
+              <input type="text" id="tac" name="tac" placeholder="">
+
+              <label for="sst">sst:</label>
+              <input type="text" id="sst" name="sst" placeholder="">
+
+              <label for="amf_host">AMF Host:</label>
+              <input type="text" id="amf_host" name="amf_host" placeholder="">
+
+              <input type="submit" value="Update Config">
+            </div>
+          </form>
+
+          <form action="{% url 'single-du-config' %}" method="post">
+            {% csrf_token %}
+            <div id="single-du-config" class="config-form">
+              <label for="du_name">DU Name:</label>
+              <input type="text" id="du_name" name="du_name" placeholder="">
+
+              <label for="f1_ifname">f1 Interface Name:</label>
+              <input type="text" id="f1_ifname" name="f1_ifname" placeholder="">
+
+              <label for="f1_int">f1 Interface IP Address:</label>
+              <input type="text" id="f1_int" name="f1_int" placeholder="">
+
+              <label for="f1_cuport">f1 CU Port:</label>
+              <input type="text" id="f1_cuport" name="f1_cuport" placeholder="">
+
+              <label for="f1_duport">f1 DU Port:</label>
+              <input type="text" id="f1_duport" name="f1_duport" placeholder="">
+
+              <label for="mcc">mcc:</label>
+              <input type="text" id="mcc" name="mcc" placeholder="">
+
+              <label for="mnc">mnc:</label>
+              <input type="text" id="mnc" name="mnc" placeholder="">
+
+              <label for="tac">tac:</label>
+              <input type="text" id="tac" name="tac" placeholder="">
+
+              <label for="sst">sst:</label>
+              <input type="text" id="sst" name="sst" placeholder="">
+
+              <label for="usrp">usrp:</label>
+              <input type="text" id="usrp" name="usrp" placeholder="">
+
+              <label for="cu_host">CU Host:</label>
+              <input type="text" id="cu_host" name="cu_host" placeholder="">
+
+              <input type="submit" value="Update Config">
+            </div>
+          </form>
+
+          <form action="{% url 'single-ue-config' %}" method="post">
+            {% csrf_token %}
+            <div id="single-ue-config" class="config-form">
+              <label for="multus_ipadd">Multus IP Address:</label>
+              <input type="text" id="multus_ipadd" name="multus_ipadd" placeholder="">
+
+              <label for="rfsimserver">RF Sim Server:</label>
+              <input type="text" id="rfsimserver" name="rfsimserver" placeholder="">
+
+              <label for="fullimsi">fullImsi:</label>
+              <input type="text" id="fullimsi" name="fullimsi" placeholder="">
+
+              <label for="fullkey">fullkey:</label>
+              <input type="text" id="fullkey" name="fullkey" placeholder="">
+
+              <label for="opc">opc:</label>
+              <input type="text" id="opc" name="opc" placeholder="">
+
+              <label for="dnn">dnn:</label>
+              <input type="text" id="dnn" name="dnn" placeholder="">
+
+              <label for="sst">sst:</label>
+              <input type="text" id="sst" name="sst" placeholder="">
+
+              <label for="sd">sd:</label>
+              <input type="text" id="sd" name="sd" placeholder="">
+
+              <label for="usrp">usrp:</label>
+              <input type="text" id="usrp" name="usrp" placeholder="">
+
+              <input type="submit" value="Update Config">
+            </div>
+          </form>
+
 
           <div id="multignb-cu-config" class="config-form">
             <label for="multus_f1_int">f1 Interface IPadd:</label>
@@ -531,82 +625,75 @@
       </div>
     </div>
     <script>
+      async function fetchAndDisplayComponentValues(apiSuffix) {
+        const apiUrl = `http://10.30.1.221/api/v1/oai/${apiSuffix}`;
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) throw new Error('Network response was not ok');
+          const data = await response.json();
+          const values = data.values;
+
+          const container = document.getElementById('current-values');
+          container.innerHTML = ''; // Clear existing content
+
+          // Dynamically create and append input fields for the API response values
+          Object.keys(values).forEach(key => {
+            const label = document.createElement('label');
+            label.textContent = `${key}:`;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = values[key];
+            input.readOnly = true; // Make input fields read-only
+            input.className = 'pod-input'; // Use your styling class
+            container.appendChild(label);
+            container.appendChild(input);
+            container.appendChild(document.createElement('br')); // Add line break for spacing
+          });
+        } catch (error) {
+          console.error('Error fetching component values:', error);
+        }
+      }
+
       function showConfigForm(component, element) {
-        var components = ["single-cu", "single-du", "single-ue", "multignb-cu", "multignb-du1",
-                          "multignb-du2", "multignb-ue", "multiue-cu", "multiue-du", "multiue-ue1", "multiue-ue2"];
+        var components = ["single-cu", "single-du", "single-ue", "multignb-cu", "multignb-du1", "multignb-du2", "multignb-ue", "multiue-cu", "multiue-du", "multiue-ue1", "multiue-ue2"];
         components.forEach(function(comp) {
-          document.getElementById(comp + "-config").style.display = "none";
+            document.getElementById(comp + "-config").style.display = "none";
         });
+
+        document.getElementById('current-values').innerHTML = ''; // Clear current values
 
         var buttons = document.querySelectorAll('.config-panel button');
         buttons.forEach(function(btn) {
-          btn.classList.remove('selected');
+            btn.classList.remove('selected');
         });
 
         if (component) {
-          document.getElementById(component + "-config").style.display = "block";
-          element.classList.add('selected');
-        }
-        const componentMap = {
-            'single-cu': 'cu',
-            'single-du': 'du',
-            'single-ue': 'ue',
-            // Add mappings for other components as necessary
-        };
+            document.getElementById(component + "-config").style.display = "block";
+            element.classList.add('selected');
 
-        const componentFilter = componentMap[component];
-        if (componentFilter) {
-            fetchPodData(componentFilter);
-        }
-      }
+            // API endpoint suffix based on the selected component
+            const apiSuffixMap = {
+                'single-cu': 'values-single-cu',
+                'single-du': 'values-single-du',
+                'single-ue': 'values-single-ue',
+                // Map other components as needed
+            };
 
-      async function fetchPodData(componentFilter) {
-        try {
-          // Adjust the URL to your actual API endpoint
-          const response = await fetch('http://10.30.1.221/api/v1/k8s/pods');
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          // Filter pods based on componentFilter
-          const filteredPods = data.pods.filter(pod => pod.name.includes(componentFilter));
-          displayCurrentValues(filteredPods);
-        } catch (error) {
-          console.error('Error fetching pod data:', error);
-          document.getElementById('current-values').innerHTML = 'Failed to load data.';
+            const apiSuffix = apiSuffixMap[component];
+            if (apiSuffix) {
+                fetchAndDisplayComponentValues(apiSuffix);
+            }
         }
       }
 
-      function displayCurrentValues(pods) {
-        const container = document.getElementById('current-values');
-        container.innerHTML = ''; // Clear existing content
+      document.querySelectorAll('.config-panel button').forEach(button => {
+        button.addEventListener('click', () => showConfigForm(button.getAttribute('data-component'), button));
+      });
 
-        if (pods.length > 0) {
-          pods.forEach(pod => {
-            pod.network_status.forEach(ns => {
-              if (ns.name === 'k8s-pod-network' || !ns.ips || ns.ips.length === 0 || ns.ips[0] === undefined) {
-                return; // Skip this iteration
-              }
-              const label = document.createElement('label');
-              label.textContent = `${ns.interface} IP Address:`;
-              container.appendChild(label);
-
-              const input = document.createElement('input');
-              input.type = 'text';
-              input.value = `${ns.ips.join(', ')}`;
-              input.className = 'pod-input'; // Use a class to apply styles
-              input.readOnly = true; // Make the input read-only
-
-              container.appendChild(input);
-
-              // Adding a break for spacing
-              container.appendChild(document.createElement('br'));
-            });
-          });
-        } else {
-          container.textContent = 'No data available for selected component.';
-        }
-      }
+      // Initial setup to hide all forms and clear current values
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('current-values').innerHTML = ''; // Clear on initial load
+      });
 
       async function fetchComponentStatus() {
         try {

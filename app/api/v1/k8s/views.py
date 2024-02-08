@@ -9,6 +9,7 @@ from kubernetes import client, config
 from kubernetes.client import configuration
 from pick import pick
 import json
+import subprocess
 
 config.load_kube_config()
 
@@ -130,17 +131,32 @@ def GetNodes(request):
 ###k8s - GET DEPLOYMENTS###
 def GetDeployments(request):
     if request.method == 'GET':
+        # Load the kubeconfig file
+        config.load_kube_config()
+
+        # Create an instance of the API class
         v1 = client.AppsV1Api()
-        deployments_list = v1.list_deployment_for_all_namespaces()
 
-        # Convert the deployments_list to a list of deployment names
-        deployments = [deployment.metadata.name for deployment in deployments_list.items]
+        # Construct the namespace from the current user's username
+        user_namespace = f"{request.user.username}-namespace"
 
-        # Return JsonResponse with the list of deployments
-        return JsonResponse({'deployments': deployments})
+        try:
+            # List deployments only in the user's namespace
+            deployments_list = v1.list_namespaced_deployment(namespace=user_namespace)
+
+            # Convert the deployments_list to a list of deployment names
+            deployments = [deployment.metadata.name for deployment in deployments_list.items]
+
+            # Return JsonResponse with the list of deployments
+            return JsonResponse({'deployments': deployments})
+
+        except client.exceptions.ApiException as e:
+            # Handle the case where the namespace does not exist or other API errors
+            return JsonResponse({'error': 'Failed to retrieve deployments', 'details': str(e)}, status=e.status)
 
     # Handle other HTTP methods if needed
-    return HttpResponse("Method not allowed", status=405)
+    else:
+        return HttpResponse("Method not allowed", status=405)
 
 ###k8s - GET SERVICES###
 def GetServices(request):
@@ -188,7 +204,7 @@ def CreateNamespace(request):
 
 ###RELATED TO 5G COMPONENTS MANAGEMENT FEATURE###
 ###SINGLE CU - RESTART###
-def RestartSingleCU(request, namespace):
+def RestartSingleCU(request):
     try:
         # Derive the namespace from the current user's username
         namespace = f"{request.user.username}-namespace"
@@ -196,6 +212,7 @@ def RestartSingleCU(request, namespace):
         subprocess.run([
             "kubectl", "rollout", "restart", "deployment", "single-cu", "--namespace", namespace
         ])
+        return HttpResponse("Success")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
 
