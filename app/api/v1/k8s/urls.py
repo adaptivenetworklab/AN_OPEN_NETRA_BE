@@ -26,4 +26,7 @@ urlpatterns = [
     path('multiue-ru-restart', views.RestartMultiueDU, name='multiue-ru-restart'),
     path('multiue-ue1-restart', views.RestartMultiueUE1, name='multiue-ue1-restart'),
     path('multiue-ue2-restart', views.RestartMultiueUE2, name='multiue-ue2-restart'),
+
+    path('logs/<str:pod_name>/', views.pod_logs_view, name='pod-logs'),
+
 ]

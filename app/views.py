@@ -13,6 +13,9 @@ from .k8s_templates import get_role_yaml, get_role_binding_yaml
 import subprocess
 from app.api.v1.k8s.views import GetPods
 from .utils import check_helm_deployment_exists
+from . import utils
+import pyshark
+
 
 ###PAGES - REVERSE###
 @login_required(login_url='login')
@@ -110,6 +113,7 @@ def monitoring(request):
 
 ###USER - CREATE A NEW USER###
 @login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser) 
 def CreateUser(request):
     if request.method == 'POST':
         try:
@@ -218,9 +222,44 @@ def LoginPage(request):
 
     return render(request, 'login.html')
 
-
 ###AUTH - LOGOUT###
 def LogoutPage(request):
     logout(request)
     return redirect('login')
 
+###INFLUX - TEST###
+def some_view(request):
+    utils.write_data_to_influx()
+    utils.query_data_from_influx()
+    return HttpResponse("InfluxDB data written and queried.")
+
+###PYSHARK - TEST###
+def capture_packets(request):
+    interface = 'eth0'  # Specify the interface you want to capture from
+    capture = pyshark.LiveCapture(interface=interface)
+
+    packets_summary = []
+    for packet in capture.sniff_continuously(packet_count=10):
+        try:
+            # Adjust the fields you're interested in
+            summary = {
+                'protocol': packet.highest_layer,
+                'length': packet.length,
+                'info': packet.sniff_time,
+            }
+            packets_summary.append(summary)
+        except AttributeError:
+            # Handle packets that might not have the attributes you're trying to access
+            continue
+
+    return JsonResponse({'packets': packets_summary})
+
+###PAGES - USER PROFILE###
+@login_required(login_url='login')
+def get_user_info(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    user_info = {
+        'username': request.user.username,
+        'level': user_profile.level,
+    }
+    return JsonResponse(user_info)

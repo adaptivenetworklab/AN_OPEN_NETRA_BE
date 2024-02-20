@@ -9,7 +9,10 @@ urlpatterns = [
     path('auth/login', views.LoginPage, name='login'),
     path('auth/logout', views.LogoutPage, name='logout'),
     path('dashboard', views.dashboard, name='dashboard'),
+    path('user-info', views.get_user_info, name='user-info'),
     path('user-management', views.UserManagement, name='user-management'),
     path('monitoring', views.monitoring, name='monitoring'),
     path('introduction', views.introduction, name='introduction'),
+    path('monitoring/test', views.some_view, name='monitoring-test'),
+    path('pyshark/test', views.capture_packets, name='pyshark-test'),
 ]  

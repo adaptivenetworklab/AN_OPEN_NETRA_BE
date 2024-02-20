@@ -336,3 +336,39 @@ def RestartMultiueUE2(request):
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"An error occurred: {e}")
 
+###MONITORING - LOGS###
+def get_pod_logs(pod_name, namespace, since_seconds=1):
+    try:
+        cmd = [
+            "kubectl", "logs", pod_name,
+            "-n", namespace,
+            "--since={}s".format(since_seconds),
+            "--timestamps",
+            "--tail=300"
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        logs = result.stdout.strip().split('\n')
+        
+        # Initialize an empty list to hold structured logs
+        structured_logs = []
+
+        for line in logs:
+            parts = line.split()
+            # Ensure the line has at least 2 parts
+            if len(parts) >= 2:
+                timestamp = parts[0]
+                log_message = " ".join(parts[1:])
+                structured_logs.append({"timestamp": timestamp, "log": log_message})
+            else:
+                print("Skipping malformed log line:", line)
+
+        return structured_logs
+    except subprocess.CalledProcessError as e:
+        print("Error fetching logs:", e)
+        return []
+
+
+def pod_logs_view(request, pod_name):
+    namespace = request.user.username + "-namespace"  # Assuming namespace is based on the user
+    logs = get_pod_logs(pod_name, namespace)
+    return JsonResponse(logs, safe=False)  # Use safe=False since we're returning a list
