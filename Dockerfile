@@ -1,10 +1,21 @@
-FROM ubuntu
+FROM python:3
 
-# Install Python
-RUN apt-get update && apt-get install -y python3 python3-pip
+ENV PYTHONUNBUFFERED 1
 
-# Copy application files
-COPY . /app
+COPY requirements.txt .
 
-# Set working directory
-WORKDIR /app
+RUN pip install -r requirements.txt
+
+ENV TZ=Asia/Bangkok
+
+RUN django-admin startproject AN_OPEN_NETRA_BE
+
+COPY . /AN_OPEN_NETRA_BE
+
+WORKDIR /AN_OPEN_NETRA_BE
+
+ENV KUBECONFIG=/AN_OPEN_NETRA_BE/kube-config
+
+EXPOSE 8000
+
+CMD [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
